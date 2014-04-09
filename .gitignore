@@ -6,7 +6,7 @@
 /docs/reference/eosmetrics/version.xml
 /emer-event-recorder-server.[ch]
 
-# Test productes
+# Test products
 *.log
 *.trs
 
