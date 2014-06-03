@@ -8,6 +8,7 @@ Build-Depends: autotools-dev,
                libgirepository1.0-dev,
                libglib2.0-dev (>= 2.38),
                pkg-config,
+               python-dbusmock,
                uuid-dev,
                yelp-tools,
                yelp-xsl
