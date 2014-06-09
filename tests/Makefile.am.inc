@@ -4,7 +4,11 @@ noinst_PROGRAMS = \
 	tests/run-tests \
 	$(NULL)
 
-TEST_FLAGS = @EOSMETRICS_CFLAGS@ -I$(top_srcdir) -DCOMPILING_EOS_METRICS
+TEST_FLAGS = @EOSMETRICS_CFLAGS@ \
+	-I$(top_srcdir) \
+	-DCOMPILING_EOS_METRICS \
+	-D_POSIX_C_SOURCE=200112L \
+	$(NULL)
 TEST_LIBS = @EOSMETRICS_LIBS@ $(top_builddir)/libeosmetrics-@EMTR_API_VERSION@.la
 
 tests_run_tests_SOURCES = \
