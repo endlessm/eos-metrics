@@ -73,14 +73,14 @@ AC_SUBST(EMTR_LT_VERSION_INFO)
 
 # Required versions of libraries
 # Update these whenever you use a function that requires a certain API version
-GLIB_REQUIREMENT="glib-2.0 >= 2.40"
-GIO_REQUIREMENT="gio-2.0 >= 2.30 gio-unix-2.0"
-GOBJECT_REQUIREMENT="gobject-2.0"
+GLIB_REQUIREMENT="gio-unix-2.0 >= 2.40"
 UUID_REQUIREMENT="uuid"
 # These go into the pkg-config file as Requires: and Requires.private:
-# (Generally, use Requires.private: instead of Requires:)
-EMTR_REQUIRED_MODULES=
-EMTR_REQUIRED_MODULES_PRIVATE="$GLIB_REQUIREMENT $GIO_REQUIREMENT $GOBJECT_REQUIREMENT $UUID_REQUIREMENT"
+# (Requires.private is for dependencies that are not exposed to the
+# application code; if we expose a type from those dependencies, we
+# need to put the corresponding library in Requires:)
+EMTR_REQUIRED_MODULES="$GLIB_REQUIREMENT $UUID_REQUIREMENT"
+EMTR_REQUIRED_MODULES_PRIVATE=
 AC_SUBST(EMTR_REQUIRED_MODULES)
 AC_SUBST(EMTR_REQUIRED_MODULES_PRIVATE)
 # This indicates a required dbus mocking interface for unit testing.
