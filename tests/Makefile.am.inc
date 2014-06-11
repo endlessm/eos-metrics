@@ -4,19 +4,23 @@ noinst_PROGRAMS = \
 	tests/run-tests \
 	$(NULL)
 
-TEST_FLAGS = @EOSMETRICS_CFLAGS@ \
+LIBRARY_TEST_FLAGS = \
+	@EOSMETRICS_CFLAGS@ \
 	-I$(top_srcdir) \
 	-DCOMPILING_EOS_METRICS \
 	-D_POSIX_C_SOURCE=200112L \
 	$(NULL)
-TEST_LIBS = @EOSMETRICS_LIBS@ $(top_builddir)/libeosmetrics-@EMTR_API_VERSION@.la
+LIBRARY_TEST_LIBS = \
+	@EOSMETRICS_LIBS@ \
+	$(top_builddir)/libeosmetrics-@EMTR_API_VERSION@.la \
+	$(NULL)
 
 tests_run_tests_SOURCES = \
 	tests/run-tests.c tests/run-tests.h \
 	tests/test-event-recorder.c \
 	$(NULL)
-tests_run_tests_CPPFLAGS = $(TEST_FLAGS)
-tests_run_tests_LDADD = $(TEST_LIBS)
+tests_run_tests_CPPFLAGS = $(LIBRARY_TEST_FLAGS)
+tests_run_tests_LDADD = $(LIBRARY_TEST_LIBS)
 
 # Run tests when running 'make check'
 TESTS = \
