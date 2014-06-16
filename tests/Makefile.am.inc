@@ -1,7 +1,7 @@
 # Copyright 2013 Endless Mobile, Inc.
 
 noinst_PROGRAMS = \
-	tests/run-tests \
+	tests/test-library.dbus \
 	$(NULL)
 
 LIBRARY_TEST_FLAGS = \
@@ -15,18 +15,26 @@ LIBRARY_TEST_LIBS = \
 	$(top_builddir)/libeosmetrics-@EMTR_API_VERSION@.la \
 	$(NULL)
 
-tests_run_tests_SOURCES = \
+tests_test_library_dbus_SOURCES = \
 	tests/run-tests.c tests/run-tests.h \
 	tests/test-event-recorder.c \
 	$(NULL)
-tests_run_tests_CPPFLAGS = $(LIBRARY_TEST_FLAGS)
-tests_run_tests_LDADD = $(LIBRARY_TEST_LIBS)
+tests_test_library_dbus_CPPFLAGS = $(LIBRARY_TEST_FLAGS)
+tests_test_library_dbus_LDADD = $(LIBRARY_TEST_LIBS)
+
+dist_noinst_SCRIPTS = \
+	tests/launch-mock-dbus-tests.sh \
+	$(NULL)
 
 # Run tests when running 'make check'
 TESTS = \
+	tests/test-library.dbus \
 	tests/test-daemon-integration.py \
 	$(NULL)
-TEST_EXTENSIONS = .py
+TEST_EXTENSIONS = .dbus .py
+DBUS_LOG_COMPILER = $(top_srcdir)/tests/launch-mock-dbus-tests.sh
+AM_DBUS_LOG_FLAGS = -k --verbose
+LOG_COMPILER = gtester
 AM_LOG_FLAGS = -k --verbose
 PY_LOG_COMPILER = python
 
