@@ -15,10 +15,7 @@ LIBRARY_TEST_LIBS = \
 	$(top_builddir)/libeosmetrics-@EMTR_API_VERSION@.la \
 	$(NULL)
 
-tests_test_library_dbus_SOURCES = \
-	tests/run-tests.c tests/run-tests.h \
-	tests/test-event-recorder.c \
-	$(NULL)
+tests_test_library_dbus_SOURCES = tests/test-event-recorder.c
 tests_test_library_dbus_CPPFLAGS = $(LIBRARY_TEST_FLAGS)
 tests_test_library_dbus_LDADD = $(LIBRARY_TEST_LIBS)
 

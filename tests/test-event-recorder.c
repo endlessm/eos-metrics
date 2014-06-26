@@ -2,8 +2,6 @@
 
 /* Copyright 2014 Endless Mobile, Inc. */
 
-#include "run-tests.h"
-
 #include "eosmetrics/eosmetrics.h"
 
 #include <glib.h>
@@ -210,9 +208,12 @@ test_event_recorder_record_multiple_metric_sequences (struct RecorderFixture *fi
   g_variant_unref (key);
 }
 
-void
-add_event_recorder_tests (void)
+int
+main (int    argc,
+      char **argv)
 {
+  g_test_init (&argc, &argv, NULL);
+
 #define ADD_RECORDER_TEST_FUNC(path, func) \
   g_test_add ((path), struct RecorderFixture, NULL, setup, (func), teardown)
 
@@ -240,4 +241,8 @@ add_event_recorder_tests (void)
                           test_event_recorder_record_auxiliary_payload);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-multiple-metric-sequences",
                           test_event_recorder_record_multiple_metric_sequences);
+
+#undef ADD_RECORDER_TEST_FUNC
+
+  return g_test_run ();
 }
