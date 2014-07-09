@@ -1,6 +1,7 @@
 # Copyright 2013 Endless Mobile, Inc.
 
 noinst_PROGRAMS = \
+	tests/test-event-types \
 	tests/test-library.dbus \
 	$(NULL)
 
@@ -19,6 +20,20 @@ tests_test_library_dbus_SOURCES = tests/test-event-recorder.c
 tests_test_library_dbus_CPPFLAGS = $(LIBRARY_TEST_FLAGS)
 tests_test_library_dbus_LDADD = $(LIBRARY_TEST_LIBS)
 
+EOSMETRICS_TEST_FLAGS = \
+	@EOSMETRICS_CFLAGS@ \
+	-I$(top_srcdir) \
+	$(NULL)
+EOSMETRICS_TEST_LIBS = @EOSMETRICS_LIBS@
+
+tests_test_event_types_SOURCES = \
+	eosmetrics/emtr-event-types.c eosmetrics/emtr-event-types.h \
+	eosmetrics/eosmetrics.h \
+	tests/test-event-types.c \
+	$(NULL)
+tests_test_event_types_CPPFLAGS = $(EOSMETRICS_TEST_FLAGS)
+tests_test_event_types_LDADD = $(EOSMETRICS_TEST_LIBS)
+
 dist_noinst_SCRIPTS = \
 	tests/launch-mock-dbus-tests.sh \
 	$(NULL)
@@ -27,6 +42,7 @@ dist_noinst_SCRIPTS = \
 TESTS = \
 	tests/test-library.dbus \
 	tests/test-daemon-integration.py \
+	tests/test-event-types \
 	$(NULL)
 TEST_EXTENSIONS = .dbus .py
 DBUS_LOG_COMPILER = $(top_srcdir)/tests/launch-mock-dbus-tests.sh
