@@ -45,4 +45,5 @@ TESTS_ENVIRONMENT = \
 EXTRA_DIST += \
 	tests/test-daemon-integration.py \
 	tests/smoke-tests/event-types.js \
+	tests/wait-for-service-helper.py \
 	$(NULL)
