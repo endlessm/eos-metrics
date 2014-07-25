@@ -2,7 +2,7 @@
 
 noinst_PROGRAMS = \
 	tests/test-event-types \
-	tests/test-library.dbus \
+	tests/test-library.dbuseventrecorder \
 	$(NULL)
 
 LIBRARY_TEST_FLAGS = \
@@ -16,9 +16,9 @@ LIBRARY_TEST_LIBS = \
 	$(top_builddir)/libeosmetrics-@EMTR_API_VERSION@.la \
 	$(NULL)
 
-tests_test_library_dbus_SOURCES = tests/test-event-recorder.c
-tests_test_library_dbus_CPPFLAGS = $(LIBRARY_TEST_FLAGS)
-tests_test_library_dbus_LDADD = $(LIBRARY_TEST_LIBS)
+tests_test_library_dbuseventrecorder_SOURCES = tests/test-event-recorder.c
+tests_test_library_dbuseventrecorder_CPPFLAGS = $(LIBRARY_TEST_FLAGS)
+tests_test_library_dbuseventrecorder_LDADD = $(LIBRARY_TEST_LIBS)
 
 EOSMETRICS_TEST_FLAGS = \
 	@EOSMETRICS_CFLAGS@ \
@@ -35,18 +35,19 @@ tests_test_event_types_CPPFLAGS = $(EOSMETRICS_TEST_FLAGS)
 tests_test_event_types_LDADD = $(EOSMETRICS_TEST_LIBS)
 
 dist_noinst_SCRIPTS = \
-	tests/launch-mock-dbus-tests.sh \
+	tests/launch-mock-event-recorder-tests.sh \
 	$(NULL)
 
 # Run tests when running 'make check'
 TESTS = \
-	tests/test-library.dbus \
+	tests/test-library.dbuseventrecorder \
 	tests/test-daemon-integration.py \
 	tests/test-event-types \
 	$(NULL)
-TEST_EXTENSIONS = .dbus .py
-DBUS_LOG_COMPILER = $(top_srcdir)/tests/launch-mock-dbus-tests.sh
-AM_DBUS_LOG_FLAGS = -k --verbose
+
+TEST_EXTENSIONS = .dbuseventrecorder .py
+DBUSEVENTRECORDER_LOG_COMPILER = $(top_srcdir)/tests/launch-mock-event-recorder-tests.sh
+AM_DBUSEVENTRECORDER_LOG_FLAGS = -k --verbose
 LOG_COMPILER = gtester
 AM_LOG_FLAGS = -k --verbose
 PY_LOG_COMPILER = python
