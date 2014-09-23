@@ -1,6 +1,6 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 
-#include "metrics-util.h"
+#include "eosmetrics/emtr-util.h"
 
 /* For clock_gettime() */
 #if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 199309L
@@ -12,21 +12,34 @@
 #include <inttypes.h>
 
 #include <glib.h>
-#include <gio/gio.h>
-#include <uuid/uuid.h>
 
-void
-get_uuid_builder (uuid_t           uuid,
-                  GVariantBuilder *uuid_builder)
-{
-  g_variant_builder_init (uuid_builder, G_VARIANT_TYPE ("ay"));
-  for (size_t i = 0; i < UUID_LENGTH; ++i)
-    g_variant_builder_add (uuid_builder, "y", uuid[i]);
-}
+#define NANOSECONDS_PER_SECOND 1000000000L
 
+/**
+ * SECTION:emtr-util
+ * @title: Util
+ * @short_description: Utilities available for use by consumers of the event
+ * recorder API.
+ * @include: eosmetrics/eosmetrics.h
+ *
+ * Refer to method documentation for more details.
+ */
+
+/**
+ * emtr_util_get_current_time: (skip)
+ * @clock_id: (in): the clock from which to read the current time
+ * @current_time: (out): a space in which to store the current time
+ *
+ * Populates @current_time with the current time according to @clock_id.
+ * Guarantees that the difference between any two successfully fetched times
+ * fits in a gint64.
+ *
+ * Returns: TRUE if the current time was successfully read and FALSE otherwise.
+ * Since: 0.2
+ */
 gboolean
-get_current_time (clockid_t clock_id,
-                  gint64   *current_time)
+emtr_util_get_current_time (clockid_t clock_id,
+                            gint64   *current_time)
 {
   g_return_val_if_fail (current_time != NULL, FALSE);
 

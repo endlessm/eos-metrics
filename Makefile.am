@@ -79,7 +79,7 @@ if HAVE_INTROSPECTION
 introspection_sources = \
 	$(filter-out %.h, $(eosmetrics_library_sources)) \
 	$(eosmetrics_public_installed_headers) \
-	$(eosmetrics_private_installed_headers) \
+	$(filter-out emer-event-recorder-server.h, $(eosmetrics_private_installed_headers)) \
 	$(NULL)
 
 EosMetrics-@EMTR_API_VERSION@.gir: libeosmetrics-@EMTR_API_VERSION@.la

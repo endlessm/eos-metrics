@@ -10,9 +10,10 @@ G_BEGIN_DECLS
 #define _EMTR_INSIDE_EOSMETRICS_H
 
 /* Pull in other header files */
-#include "emtr-types.h"
 #include "emtr-event-recorder.h"
 #include "emtr-event-types.h"
+#include "emtr-types.h"
+#include "emtr-util.h"
 
 #undef _EMTR_INSIDE_EOSMETRICS_H
 

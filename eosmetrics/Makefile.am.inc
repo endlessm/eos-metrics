@@ -8,13 +8,15 @@ eosmetrics_private_installed_headers = \
 	eosmetrics/emtr-event-types.h \
 	eosmetrics/emtr-macros.h \
 	eosmetrics/emtr-types.h \
+	eosmetrics/emtr-util.h \
 	eosmetrics/emtr-version.h \
+	emer-event-recorder-server.h \
 	$(NULL)
 
 eosmetrics_library_sources = \
-	emer-event-recorder-server.c emer-event-recorder-server.h \
 	eosmetrics/emtr-event-recorder.c \
-	shared/metrics-util.c shared/metrics-util.h \
+	eosmetrics/emtr-util.c \
+	emer-event-recorder-server.c \
 	$(NULL)
 
 lib_LTLIBRARIES = libeosmetrics-@EMTR_API_VERSION@.la

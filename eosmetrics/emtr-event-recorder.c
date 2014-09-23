@@ -9,7 +9,7 @@
 
 #include "emtr-event-recorder.h"
 #include "emer-event-recorder-server.h"
-#include "shared/metrics-util.h"
+#include "eosmetrics/emtr-util.h"
 
 #include <time.h>
 
@@ -20,6 +20,12 @@
 
 /* Convenience macro to check that @ptr is a #GVariant */
 #define _IS_VARIANT(ptr) (g_variant_is_of_type ((ptr), G_VARIANT_TYPE_ANY))
+
+/*
+ * The number of elements in a uuid_t. uuid_t is assumed to be a fixed-length
+ * array of guchar.
+ */
+#define UUID_LENGTH (sizeof (uuid_t) / sizeof (guchar))
 
 /**
  * SECTION:emtr-event-recorder
@@ -201,6 +207,19 @@ get_normalized_form_of_variant (GVariant *variant)
     }
 
   return normalized_variant;
+}
+
+/*
+ * Initializes the given uuid_builder and populates it with the contents of
+ * uuid.
+ */
+static void
+get_uuid_builder (uuid_t           uuid,
+                  GVariantBuilder *uuid_builder)
+{
+  g_variant_builder_init (uuid_builder, G_VARIANT_TYPE ("ay"));
+  for (size_t i = 0; i < UUID_LENGTH; ++i)
+    g_variant_builder_add (uuid_builder, "y", uuid[i]);
 }
 
 static GVariant *
@@ -425,7 +444,7 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
   /* Get the time before doing anything else because it will change during
   execution. */
   gint64 relative_time;
-  if (!get_current_time (CLOCK_BOOTTIME, &relative_time))
+  if (!emtr_util_get_current_time (CLOCK_BOOTTIME, &relative_time))
     {
       g_critical ("Getting relative timestamp failed.");
       return;
@@ -510,7 +529,7 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
   /* Get the time before doing anything else because it will change during
   execution. */
   gint64 relative_time;
-  if (!get_current_time (CLOCK_BOOTTIME, &relative_time))
+  if (!emtr_util_get_current_time (CLOCK_BOOTTIME, &relative_time))
     {
       g_critical ("Getting relative timestamp failed.");
       return;
@@ -636,7 +655,7 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
 
   // Get the time as soon as possible because it will change during execution.
   gint64 relative_time;
-  if (!get_current_time (CLOCK_BOOTTIME, &relative_time))
+  if (!emtr_util_get_current_time (CLOCK_BOOTTIME, &relative_time))
     {
       g_critical ("Getting relative timestamp failed.");
       goto finally;
@@ -750,7 +769,7 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
 
   // Get the time as soon as possible because it will change during execution.
   gint64 relative_time;
-  if (!get_current_time (CLOCK_BOOTTIME, &relative_time))
+  if (!emtr_util_get_current_time (CLOCK_BOOTTIME, &relative_time))
     {
       g_critical ("Getting relative timestamp failed.");
       goto finally;
@@ -864,7 +883,7 @@ emtr_event_recorder_record_stop (EmtrEventRecorder *self,
 
   // Get the time as soon as possible because it will change during execution.
   gint64 relative_time;
-  if (!get_current_time (CLOCK_BOOTTIME, &relative_time))
+  if (!emtr_util_get_current_time (CLOCK_BOOTTIME, &relative_time))
     {
       g_critical ("Getting relative timestamp failed.");
       goto finally;

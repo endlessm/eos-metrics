@@ -18,7 +18,7 @@ m4_define([_EMTR_API_VERSION_MACRO], [0])
 # Minor and micro versions: increment micro version when making a release. Minor
 # version is even for a stable release and odd for a development release.
 # When making any release, if the API changes, set the interface age to 0.
-m4_define([_EMTR_MINOR_VERSION_MACRO], [0])
+m4_define([_EMTR_MINOR_VERSION_MACRO], [2])
 m4_define([_EMTR_MICRO_VERSION_MACRO], [0])
 m4_define([_EMTR_INTERFACE_AGE_MACRO], [0])
 
@@ -73,15 +73,14 @@ AC_SUBST(EMTR_LT_VERSION_INFO)
 
 # Required versions of libraries
 # Update these whenever you use a function that requires a certain API version
-GOBJECT_REQUIREMENT="gobject-2.0"
+# Keep these lists sorted alphabetically.
 GIO_REQUIREMENT="gio-unix-2.0 >= 2.40"
+GOBJECT_REQUIREMENT="gobject-2.0"
 UUID_REQUIREMENT="uuid"
 # These go into the pkg-config file as Requires: and Requires.private:
 # (Requires.private is for dependencies that are not exposed to the
 # application code; if we expose a type from those dependencies, we
 # need to put the corresponding library in Requires:).
-#
-# Keep the list sorted alphabetically.
 EMTR_REQUIRED_MODULES="$GOBJECT_REQUIREMENT"
 EMTR_REQUIRED_MODULES_PRIVATE="$GIO_REQUIREMENT $UUID_REQUIREMENT"
 AC_SUBST(EMTR_REQUIRED_MODULES)

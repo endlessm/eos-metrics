@@ -9,9 +9,7 @@ $(daemon_dbus_sources): data/com.endlessm.Metrics.xml
 		--interface-prefix com.endlessm.Metrics. \
 		$<
 
-EXTRA_DIST += \
-	data/com.endlessm.Metrics.xml \
-	$(NULL)
+dist_pkgdata_DATA = data/com.endlessm.Metrics.xml
 
 CLEANFILES += \
 	$(daemon_dbus_sources) \
