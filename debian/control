@@ -1,6 +1,6 @@
 Source: eos-metrics
 Priority: standard
-Maintainer: Philip Chimento <philip@endlessm.com>
+Maintainer: Kurt von Laven <kurt@endlessm.com>
 Build-Depends: autotools-dev,
                debhelper (>= 8.0.0),
                gobject-introspection,
@@ -31,6 +31,7 @@ Section: non-free/libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends}
+Suggests: eos-event-recorder-daemon
 Description: EndlessOS Metrics Kit
  Library for recording and sending metrics data in EndlessOS.
 

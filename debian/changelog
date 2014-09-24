@@ -1,3 +1,9 @@
+eos-metrics (0.2.0) unstable; urgency=low
+
+  * Package now installs utility header and event recorder server XML files.
+
+ -- Kurt von Laven <kurt@endlessm.com>  Fri, 03 Oct 2014 17:55:00 -0500
+
 eos-metrics (0.0.0) unstable; urgency=low
 
   * Initial release
