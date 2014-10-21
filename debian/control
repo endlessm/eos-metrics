@@ -31,7 +31,7 @@ Section: non-free/libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends}
-Suggests: eos-event-recorder-daemon
+Recommends: eos-event-recorder-daemon
 Description: EndlessOS Metrics Kit
  Library for recording and sending metrics data in EndlessOS.
 
