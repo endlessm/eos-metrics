@@ -27,12 +27,12 @@
 #ifndef EMTR_UTIL_PRIVATE_H
 #define EMTR_UTIL_PRIVATE_H
 
+#include <sys/types.h>
+
 /* For clockid_t */
 #if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 199309L
 #error "This code requires _POSIX_C_SOURCE to be 199309L or later."
 #endif
-
-#include <sys/types.h>
 
 #include <glib.h>
 
