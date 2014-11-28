@@ -265,6 +265,30 @@ get_time_with_maybe_variant (EmtrEventRecorderPrivate *priv,
   return g_variant_new ("(xbv)", relative_time, has_payload, maybe_payload);
 }
 
+/* 
+ * Determines if a maybe variant exists anywhere within the given GVariant. 
+ * If this GVariant does contain a maybe type, it will log a critical
+ * warning and return TRUE. If no maybe types are found, it will return
+ * FALSE. 
+ */
+static gboolean
+check_for_maybe_variant (GVariant *variant)
+{
+  if (variant == NULL)
+    return FALSE;
+
+  // type_string belongs to the GVariant and should not be freed.
+  const gchar *type_string = g_variant_get_type_string (variant);
+  gchar *found_character = g_strrstr (type_string, "m");
+  if (found_character != NULL)
+    {
+      g_critical ("Maybe type found in auxiliary payload. These are not "
+                  "compatible with DBus!");
+      return TRUE;
+    }
+  return FALSE;
+}
+
 /* FIXME: The fact that this function needs @priv makes it a prime candidate for
 refactoring. */
 static void
@@ -437,7 +461,8 @@ emtr_event_recorder_get_default (void)
  * @event_id: (in): an RFC 4122 UUID representing the type of event that took
  * place
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
- * the event
+ * the event. Must not contain maybe variants as they are not compatible with
+ * DBus.
  *
  * Make a best-effort to record the fact that an event of type @event_id
  * happened at the current time. emtr-event-types.h is the registry for event
@@ -475,6 +500,9 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
   g_return_if_fail (self != NULL && EMTR_IS_EVENT_RECORDER (self));
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
+
+  if (check_for_maybe_variant (auxiliary_payload))
+    return;
 
 #ifdef DEBUG
   {
@@ -520,7 +548,8 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
  * place
  * @num_events: (in): the number of times the event type took place
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
- * the events
+ * the events. Must not contain maybe variants as they are not compatible with
+ * DBus.
  *
  * Make a best-effort to record the fact that @num_events events of type
  * @event_id happened between the current time and the previous such recording.
@@ -560,6 +589,9 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
   g_return_if_fail (self != NULL && EMTR_IS_EVENT_RECORDER (self));
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
+
+  if (check_for_maybe_variant (auxiliary_payload))
+    return;
 
 #ifdef DEBUG
   {
@@ -606,7 +638,8 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
  * @key: (allow-none) (in): the identifier used to associate the start of the
  * event with the stop and any progress
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
- * the events
+ * the events. Must not contain maybe variants as they are not compatible with
+ * DBus.
  *
  * Make a best-effort to record the fact that an event of type @event_id
  * started at the current time. The event's stop must be reported using
@@ -651,6 +684,9 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
   g_return_if_fail (key == NULL || _IS_VARIANT (key));
   g_return_if_fail (auxiliary_payload == NULL ||
                     _IS_VARIANT (auxiliary_payload));
+
+  if (check_for_maybe_variant (auxiliary_payload))
+    return;
 
 #ifdef DEBUG
   {
@@ -745,7 +781,8 @@ finally:
  * @key: (allow-none) (in): the identifier used to associate the event progress
  * with the start, stop, and any other progress
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
- * the events
+ * the events. Must not contain maybe variants as they are not compatible with
+ * DBus.
  *
  * Make a best-effort to record the fact that an event of type @event_id
  * progressed at the current time. May be called arbitrarily many times between
@@ -765,6 +802,9 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
   g_return_if_fail (key == NULL || _IS_VARIANT (key));
   g_return_if_fail (auxiliary_payload == NULL ||
                     _IS_VARIANT (auxiliary_payload));
+
+  if (check_for_maybe_variant (auxiliary_payload))
+    return;
 
 #ifdef DEBUG
   {
@@ -861,7 +901,8 @@ finally:
  * @key: (allow-none) (in): the identifier used to associate the stop of the
  * event with the start and any progress
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
- * the events
+ * the events. Must not contain maybe variants as they are not compatible with
+ * DBus.
  *
  * Make a best-effort to record the fact that an event of type @event_id
  * stopped at the current time. Behaves like emtr_event_recorder_record_start().
@@ -879,6 +920,9 @@ emtr_event_recorder_record_stop (EmtrEventRecorder *self,
   g_return_if_fail (key == NULL || _IS_VARIANT (key));
   g_return_if_fail (auxiliary_payload == NULL ||
                     _IS_VARIANT (auxiliary_payload));
+
+  if (check_for_maybe_variant (auxiliary_payload))
+    return;
 
 #ifdef DEBUG
   {
