@@ -301,7 +301,7 @@ send_event_to_dbus_finish_callback (EmerEventRecorderServer *dbus_proxy,
     }
 }
 
-/* Send either singular or aggregate event to DBus, currently a no-op.
+/* Send either singular or aggregate event to DBus.
    num_events parameter is ignored if is_aggregate is FALSE. */
 static void
 send_event_to_dbus (EmtrEventRecorderPrivate *priv,
