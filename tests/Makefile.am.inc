@@ -85,7 +85,5 @@ EXTRA_DIST += \
 	tests/smoke-tests/smokeEventRecorderHeavyPayload.js \
 	tests/smoke-tests/smokeEventRecorder.js \
 	tests/smoke-tests/smokeLibrary.js \
-	tests/smoke-tests/smokeOpenProgram.js \
-	tests/smoke-tests/smokeProgram.js \
 	tests/wait-for-service-helper.py \
 	$(NULL)
