@@ -29,6 +29,8 @@
 #include <glib.h>
 #include <gio/gio.h>
 
+#define EOS_METRICS_LOG_DOMAIN "EosMetrics"
+
 #define MEANINGLESS_EVENT "350ac4ff-3026-4c25-9e7e-e8103b4fd5d8"
 #define MEANINGLESS_EVENT_2 "d936cd5c-08de-4d4e-8a87-8df1f4a33cba"
 
@@ -230,6 +232,47 @@ test_event_recorder_record_multiple_metric_sequences (struct RecorderFixture *fi
   g_variant_unref (key);
 }
 
+static void
+test_event_recorder_record_auxiliary_payload_with_maybe_throws_critical (struct RecorderFixture *fixture,
+                                                                         gconstpointer           unused)
+{
+  const gchar *error_message = "*Maybe type found in auxiliary payload. These "
+                               "are not compatible with DBus!*";
+
+  g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                         error_message);
+  emtr_event_recorder_record_event (fixture->recorder, MEANINGLESS_EVENT,
+                                    g_variant_new ("mb", TRUE));
+  g_test_assert_expected_messages ();
+
+  g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                         error_message);
+  emtr_event_recorder_record_events (fixture->recorder, MEANINGLESS_EVENT,
+                                     G_GINT64_CONSTANT (7),
+                                     g_variant_new ("mb", NULL));
+  g_test_assert_expected_messages ();
+
+  g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                         error_message);
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT, NULL,
+                                    g_variant_new ("md", 5812.512));
+  g_test_assert_expected_messages ();
+
+  g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                         error_message);
+  emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT, NULL,
+                                       g_variant_new ("md", -12.0));
+  g_test_assert_expected_messages ();
+
+  g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                         error_message);
+  emtr_event_recorder_record_stop (fixture->recorder, MEANINGLESS_EVENT, NULL,
+                                   g_variant_new ("(xmt)",
+                                                  G_GINT64_CONSTANT (-82),
+                                                  G_GUINT64_CONSTANT (19)));
+  g_test_assert_expected_messages ();
+}
+
 int
 main (int    argc,
       char **argv)
@@ -263,6 +306,8 @@ main (int    argc,
                           test_event_recorder_record_auxiliary_payload);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-multiple-metric-sequences",
                           test_event_recorder_record_multiple_metric_sequences);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-auxiliary-payload-with-maybe-throws-critical",
+                          test_event_recorder_record_auxiliary_payload_with_maybe_throws_critical);
 
 #undef ADD_RECORDER_TEST_FUNC
 
