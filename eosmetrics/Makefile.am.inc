@@ -50,6 +50,7 @@ libeosmetrics_@EMTR_API_VERSION@_la_SOURCES = \
 # and turn on debug messages
 libeosmetrics_@EMTR_API_VERSION@_la_CPPFLAGS = \
 	@EOSMETRICS_CFLAGS@ \
+	@EOS_C_COVERAGE_CFLAGS@ \
 	-DG_LOG_DOMAIN=\"EosMetrics\" \
 	-DCOMPILING_EOS_METRICS \
 	-D_POSIX_C_SOURCE=200112L \
@@ -59,4 +60,5 @@ libeosmetrics_@EMTR_API_VERSION@_la_LIBADD = @EOSMETRICS_LIBS@
 libeosmetrics_@EMTR_API_VERSION@_la_LDFLAGS = \
 	-version-info @EMTR_LT_VERSION_INFO@ \
 	-export-symbols-regex "^emtr_" \
+	@EOS_C_COVERAGE_LDFLAGS@ \
 	$(NULL)

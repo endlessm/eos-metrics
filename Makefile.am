@@ -71,6 +71,19 @@ endif
 
 include $(top_srcdir)/data/Makefile.am.inc
 
+# # # COVERAGE # # #
+
+EOS_COVERAGE_BLACKLIST_PATTERNS =	\
+	*/tests/*			\
+	*emer-event-recorder-server.c	\
+	$(NULL)
+
+# These need to be defined before eosmetrics/Makefile.am.inc is included
+# so that we can use EOS_C_COVERAGE_CFLAGS and EOS_C_COVERAGE_LDFLAGS.
+@EOS_COVERAGE_RULES@
+
+AM_LDFLAGS = @EOS_C_COVERAGE_LDFLAGS@
+
 # # # LIBRARY # # #
 
 # Metrics library
