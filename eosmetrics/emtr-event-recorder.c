@@ -255,10 +255,13 @@ combine_event_id_with_key (uuid_t    event_id,
 
 /* Variants sent to DBus are not allowed to be NULL or maybe types. */
 static GVariant *
-get_time_with_maybe_variant (EmtrEventRecorderPrivate *priv,
-                             gint64                    relative_time,
-                             GVariant                 *payload)
+get_time_with_maybe_variant (EmtrEventRecorder *self,
+                             gint64             relative_time,
+                             GVariant          *payload)
 {
+  EmtrEventRecorderPrivate *priv =
+    emtr_event_recorder_get_instance_private (self);
+
   gboolean has_payload = (payload != NULL);
   GVariant *maybe_payload = has_payload ?
     payload : priv->empty_auxiliary_payload;
@@ -289,15 +292,13 @@ check_for_maybe_variant (GVariant *variant)
   return FALSE;
 }
 
-/* FIXME: The fact that this function needs @priv makes it a prime candidate for
-refactoring. */
 static void
-append_event_to_sequence (EmtrEventRecorderPrivate *priv,
-                          GArray                   *event_sequence,
-                          gint64                    relative_time,
-                          GVariant                 *auxiliary_payload)
+append_event_to_sequence (EmtrEventRecorder *self,
+                          GArray            *event_sequence,
+                          gint64             relative_time,
+                          GVariant          *auxiliary_payload)
 {
-  GVariant *curr_event_variant = get_time_with_maybe_variant (priv,
+  GVariant *curr_event_variant = get_time_with_maybe_variant (self,
                                                               relative_time,
                                                               auxiliary_payload);
   g_array_append_val (event_sequence, curr_event_variant);
@@ -328,13 +329,16 @@ send_event_to_dbus_finish_callback (EmerEventRecorderServer *dbus_proxy,
 /* Send either singular or aggregate event to DBus.
    num_events parameter is ignored if is_aggregate is FALSE. */
 static void
-send_event_to_dbus (EmtrEventRecorderPrivate *priv,
-                    uuid_t                    parsed_event_id,
-                    GVariant                 *auxiliary_payload,
-                    gint64                    relative_time,
-                    gboolean                  is_aggregate,
-                    gint                      num_events)
+send_event_to_dbus (EmtrEventRecorder *self,
+                    uuid_t             parsed_event_id,
+                    GVariant          *auxiliary_payload,
+                    gint64             relative_time,
+                    gboolean           is_aggregate,
+                    gint               num_events)
 {
+  EmtrEventRecorderPrivate *priv =
+    emtr_event_recorder_get_instance_private (self);
+
   GVariantBuilder uuid_builder;
   get_uuid_builder (parsed_event_id, &uuid_builder);
   GVariant *event_id_variant = g_variant_builder_end (&uuid_builder);
@@ -375,10 +379,13 @@ send_event_to_dbus (EmtrEventRecorderPrivate *priv,
  * Sends the corresponding event_sequence GVariant to D-Bus.
  */
 static void
-send_event_sequence_to_dbus (EmtrEventRecorderPrivate *priv,
-                             GVariant                 *event_id,
-                             GArray                   *event_sequence)
+send_event_sequence_to_dbus (EmtrEventRecorder *self,
+                             GVariant          *event_id,
+                             GArray            *event_sequence)
 {
+  EmtrEventRecorderPrivate *priv =
+    emtr_event_recorder_get_instance_private (self);
+
   GVariantBuilder event_sequence_builder;
   g_variant_builder_init (&event_sequence_builder, G_VARIANT_TYPE ("a(xbv)"));
   for (gint i = 0; i < event_sequence->len; i++)
@@ -530,7 +537,7 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
 
   auxiliary_payload = get_normalized_form_of_variant (auxiliary_payload);
 
-  send_event_to_dbus (priv,
+  send_event_to_dbus (self,
                       parsed_event_id,
                       auxiliary_payload,
                       relative_time,
@@ -619,7 +626,7 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
 
   auxiliary_payload = get_normalized_form_of_variant (auxiliary_payload);
 
-  send_event_to_dbus (priv,
+  send_event_to_dbus (self,
                       parsed_event_id,
                       auxiliary_payload,
                       relative_time,
@@ -734,7 +741,7 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
   auxiliary_payload = get_normalized_form_of_variant (auxiliary_payload);
   GArray *event_sequence = g_array_sized_new (FALSE, FALSE,
                                               sizeof (GVariant *), 2);
-  append_event_to_sequence (priv, event_sequence, relative_time,
+  append_event_to_sequence (self, event_sequence, relative_time,
                             auxiliary_payload);
   if (auxiliary_payload != NULL)
     g_variant_unref (auxiliary_payload);
@@ -883,7 +890,7 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
 
   auxiliary_payload = get_normalized_form_of_variant (auxiliary_payload);
 
-  append_event_to_sequence (priv, event_sequence, relative_time,
+  append_event_to_sequence (self, event_sequence, relative_time,
                             auxiliary_payload);
 
   if (auxiliary_payload != NULL)
@@ -1001,14 +1008,14 @@ emtr_event_recorder_record_stop (EmtrEventRecorder *self,
 
   auxiliary_payload = get_normalized_form_of_variant (auxiliary_payload);
 
-  append_event_to_sequence (priv, event_sequence, relative_time,
+  append_event_to_sequence (self, event_sequence, relative_time,
                             auxiliary_payload);
 
   if (auxiliary_payload != NULL)
     g_variant_unref (auxiliary_payload);
 
   GVariant *event_id_variant = g_variant_get_child_value (event_id_with_key, 0);
-  send_event_sequence_to_dbus (priv, event_id_variant, event_sequence);
+  send_event_sequence_to_dbus (self, event_id_variant, event_sequence);
   g_variant_unref (event_id_variant);
 
   g_assert (g_hash_table_remove (priv->events_by_id_with_key,
