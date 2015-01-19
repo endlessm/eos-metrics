@@ -48,6 +48,11 @@ Makefile.in
 /test-driver
 *.tar.gz
 
+# Unit test / coverage reports
+*.gcda
+*.gcno
+/_coverage
+
 # Gtk-doc
 /gtk-doc.make
 /m4/gtk-doc.m4
