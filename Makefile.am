@@ -42,11 +42,7 @@ AM_CFLAGS = @STRICT_CFLAGS@
 
 # Make sure to run Gtk-doc tests and build the documentation when doing
 # 'make distcheck'
-AM_DISTCHECK_CONFIGURE_FLAGS = \
-	--enable-gtk-doc \
-	--enable-gir-doc \
-	--enable-strict-flags \
-	$(NULL)
+AM_DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 # Generated files that 'make clean' should erase
 CLEANFILES =
@@ -61,8 +57,8 @@ dist-hook:
 else
 dist-hook:
 	@echo "***"
-	@echo "*** You must configure with --enable-gtk-doc and --enable-gir-doc to"
-	@echo "*** run make dist or make distcheck."
+	@echo "*** You must configure with --enable-gtk-doc to run make dist or"
+	@echo "*** make distcheck."
 	@echo "***"
 	@false
 endif
