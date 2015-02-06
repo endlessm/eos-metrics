@@ -178,11 +178,11 @@ dnl Strip leading spaces
 STRICT_CFLAGS=${STRICT_CFLAGS#*  }
 AC_SUBST(STRICT_CFLAGS)
 
-# --enable-gir-doc: Build GIR documentation for Javascript. Done automatically
+# --enable-gir-doc: Build GIR documentation for JavaScript. Done automatically
 # during 'make distcheck'.
 AC_ARG_ENABLE([gir-doc],
     [AS_HELP_STRING([--enable-gir-doc],
-        [Build GIR documentation for Javascript @<:@default=no@:>@])])
+        [Build GIR documentation for JavaScript @<:@default=no@:>@])])
 AS_IF([test "x$enable_gir_doc" = "xyes"], [
     AS_IF([test "x$GIRDOCTOOL" = "xnotfound"],
         [AC_MSG_ERROR([g-ir-doc-tool must be installed for --enable-gir-doc])])
