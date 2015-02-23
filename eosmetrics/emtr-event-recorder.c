@@ -33,6 +33,7 @@
 #include "emer-event-recorder-server.h"
 #include "eosmetrics/emtr-util.h"
 
+#include <string.h>
 #include <time.h>
 
 #include <gio/gio.h>
@@ -268,21 +269,15 @@ get_time_with_maybe_variant (EmtrEventRecorder *self,
   return g_variant_new ("(xbv)", relative_time, has_payload, maybe_payload);
 }
 
-/* 
- * Determines if a maybe variant exists anywhere within the given GVariant. 
- * If this GVariant does contain a maybe type, it will log a critical
- * warning and return TRUE. If no maybe types are found, it will return
- * FALSE. 
- */
 static gboolean
-check_for_maybe_variant (GVariant *variant)
+contains_maybe_variant (GVariant *variant)
 {
   if (variant == NULL)
     return FALSE;
 
   // type_string belongs to the GVariant and should not be freed.
   const gchar *type_string = g_variant_get_type_string (variant);
-  gchar *found_character = g_strrstr (type_string, "m");
+  gchar *found_character = strstr (type_string, "m");
   if (found_character != NULL)
     {
       g_critical ("Maybe type found in auxiliary payload. These are not "
@@ -508,7 +503,7 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
@@ -597,7 +592,7 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
@@ -692,7 +687,7 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
   g_return_if_fail (auxiliary_payload == NULL ||
                     _IS_VARIANT (auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
@@ -810,7 +805,7 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
   g_return_if_fail (auxiliary_payload == NULL ||
                     _IS_VARIANT (auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
@@ -928,7 +923,7 @@ emtr_event_recorder_record_stop (EmtrEventRecorder *self,
   g_return_if_fail (auxiliary_payload == NULL ||
                     _IS_VARIANT (auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
