@@ -268,12 +268,6 @@ get_time_with_maybe_variant (EmtrEventRecorder *self,
   return g_variant_new ("(xbv)", relative_time, has_payload, maybe_payload);
 }
 
-/* 
- * Determines if a maybe variant exists anywhere within the given GVariant. 
- * If this GVariant does contain a maybe type, it will log a critical
- * warning and return TRUE. If no maybe types are found, it will return
- * FALSE. 
- */
 static gboolean
 check_for_maybe_variant (GVariant *variant)
 {
