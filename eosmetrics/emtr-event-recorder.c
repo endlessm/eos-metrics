@@ -269,7 +269,7 @@ get_time_with_maybe_variant (EmtrEventRecorder *self,
 }
 
 static gboolean
-check_for_maybe_variant (GVariant *variant)
+contains_maybe_variant (GVariant *variant)
 {
   if (variant == NULL)
     return FALSE;
@@ -502,7 +502,7 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
@@ -591,7 +591,7 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
@@ -686,7 +686,7 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
   g_return_if_fail (auxiliary_payload == NULL ||
                     _IS_VARIANT (auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
@@ -804,7 +804,7 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
   g_return_if_fail (auxiliary_payload == NULL ||
                     _IS_VARIANT (auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
@@ -922,7 +922,7 @@ emtr_event_recorder_record_stop (EmtrEventRecorder *self,
   g_return_if_fail (auxiliary_payload == NULL ||
                     _IS_VARIANT (auxiliary_payload));
 
-  if (check_for_maybe_variant (auxiliary_payload))
+  if (contains_maybe_variant (auxiliary_payload))
     return;
 
 #ifdef DEBUG
