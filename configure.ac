@@ -1,26 +1,22 @@
 dnl Process this file with autoconf to produce configure
 
-# The MIT License (MIT)
-#
-# Copyright (c) 2013-2014 Endless Mobile, Inc.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+dnl Copyright 2013, 2014, 2015 Endless Mobile, Inc.
+
+dnl This file is part of eos-metrics.
+dnl
+dnl eos-metrics is free software: you can redistribute it and/or modify
+dnl it under the terms of the GNU Lesser General Public License as published
+dnl by the Free Software Foundation, either version 2.1 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl eos-metrics is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU Lesser General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU Lesser General Public
+dnl License along with eos-metrics.  If not, see
+dnl <http://www.gnu.org/licenses/>.
 
 dnl ------------
 dnl configure.ac
