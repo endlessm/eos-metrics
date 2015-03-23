@@ -121,9 +121,7 @@ emtr_event_recorder_finalize (GObject *object)
   g_mutex_clear (&(priv->events_by_id_with_key_lock));
 
   g_variant_unref (priv->empty_auxiliary_payload);
-
-  if (priv->dbus_proxy != NULL)
-    g_object_unref (priv->dbus_proxy);
+  g_clear_object (&priv->dbus_proxy);
 
   G_OBJECT_CLASS (emtr_event_recorder_parent_class)->finalize (object);
 }
