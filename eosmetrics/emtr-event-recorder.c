@@ -293,15 +293,15 @@ append_event_to_sequence (EmtrEventRecorder *self,
 }
 
 /*
- * The callback for the asynchronous D-Bus calls, send_event_to_dbus and
+ * The callback for the asynchronous D-Bus calls, send_events_to_dbus and
  * send_event_sequence_to_dbus. Calls the finish method.
  * @finish_callback: the finish D-Bus method call, will be called in this
  * function.
  */
 static void
-send_event_to_dbus_finish_callback (EmerEventRecorderServer *dbus_proxy,
-                                    GAsyncResult            *res,
-                                    FinishCallback           finish_callback)
+send_events_to_dbus_finish_callback (EmerEventRecorderServer *dbus_proxy,
+                                     GAsyncResult            *res,
+                                     FinishCallback           finish_callback)
 {
   GError *error = NULL;
   gboolean success = finish_callback (dbus_proxy, res, &error);
@@ -317,12 +317,12 @@ send_event_to_dbus_finish_callback (EmerEventRecorderServer *dbus_proxy,
 /* Send either singular or aggregate event to DBus.
    num_events parameter is ignored if is_aggregate is FALSE. */
 static void
-send_event_to_dbus (EmtrEventRecorder *self,
-                    uuid_t             parsed_event_id,
-                    GVariant          *auxiliary_payload,
-                    gint64             relative_time,
-                    gboolean           is_aggregate,
-                    gint               num_events)
+send_events_to_dbus (EmtrEventRecorder *self,
+                     uuid_t             parsed_event_id,
+                     GVariant          *auxiliary_payload,
+                     gint64             relative_time,
+                     gboolean           is_aggregate,
+                     gint               num_events)
 {
   EmtrEventRecorderPrivate *priv =
     emtr_event_recorder_get_instance_private (self);
@@ -346,7 +346,7 @@ send_event_to_dbus (EmtrEventRecorder *self,
                                                               has_payload,
                                                               maybe_auxiliary_payload,
                                                               NULL /* GCancellable */,
-                                                              (GAsyncReadyCallback) send_event_to_dbus_finish_callback,
+                                                              (GAsyncReadyCallback) send_events_to_dbus_finish_callback,
                                                               (FinishCallback) emer_event_recorder_server_call_record_aggregate_event_finish);
     }
   else
@@ -358,7 +358,7 @@ send_event_to_dbus (EmtrEventRecorder *self,
                                                              has_payload,
                                                              maybe_auxiliary_payload,
                                                              NULL /* GCancellable */,
-                                                             (GAsyncReadyCallback) send_event_to_dbus_finish_callback,
+                                                             (GAsyncReadyCallback) send_events_to_dbus_finish_callback,
                                                              (FinishCallback) emer_event_recorder_server_call_record_singular_event_finish);
     }
 }
@@ -389,7 +389,7 @@ send_event_sequence_to_dbus (EmtrEventRecorder *self,
                                                          event_id,
                                                          event_sequence_variant,
                                                          NULL /* GCancellable */,
-                                                         (GAsyncReadyCallback) send_event_to_dbus_finish_callback,
+                                                         (GAsyncReadyCallback) send_events_to_dbus_finish_callback,
                                                          (FinishCallback) emer_event_recorder_server_call_record_event_sequence_finish);
 }
 
@@ -525,12 +525,12 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
 
   auxiliary_payload = get_normalized_form_of_variant (auxiliary_payload);
 
-  send_event_to_dbus (self,
-                      parsed_event_id,
-                      auxiliary_payload,
-                      relative_time,
-                      FALSE, // Is not aggregate.
-                      0); // Ignored: num_events
+  send_events_to_dbus (self,
+                       parsed_event_id,
+                       auxiliary_payload,
+                       relative_time,
+                       FALSE, // Is not aggregate.
+                       0); // Ignored: num_events
 
   if (auxiliary_payload != NULL)
     g_variant_unref (auxiliary_payload);
@@ -614,12 +614,12 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
 
   auxiliary_payload = get_normalized_form_of_variant (auxiliary_payload);
 
-  send_event_to_dbus (self,
-                      parsed_event_id,
-                      auxiliary_payload,
-                      relative_time,
-                      TRUE, // Is aggregate.
-                      num_events);
+  send_events_to_dbus (self,
+                       parsed_event_id,
+                       auxiliary_payload,
+                       relative_time,
+                       TRUE, // Is aggregate.
+                       num_events);
 
   if (auxiliary_payload != NULL)
     g_variant_unref (auxiliary_payload);
