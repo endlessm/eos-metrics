@@ -34,6 +34,10 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
     _MOCK_EVENT_NOTHING_HAPPENED = '5071dd96-bdad-4ee5-9c26-3dfef34a9963'
     _MOCK_EVENT_NOTHING_HAPPENED_BYTES = uuid.UUID(_MOCK_EVENT_NOTHING_HAPPENED).bytes
     _NANOSECONDS_PER_SECOND = 1000000000L
+    _METRICS_BUS_NAME = 'com.endlessm.Metrics'
+    _METRICS_OBJECT_PATH = '/com/endlessm/Metrics'
+    _METRICS_IFACE = 'com.endlessm.Metrics.EventRecorderServer'
+
     """
     Makes sure that the app-facing EosMetrics.EventRecorder interface calls
     the com.endlessm.Metrics.EventRecorder DBus interface and marshals all its
@@ -50,16 +54,23 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         klass.dbus_con = klass.get_dbus(system_bus=True)
 
     def setUp(self):
-        self.dbus_mock = self.spawn_server('com.endlessm.Metrics',
-            '/com/endlessm/Metrics', 'com.endlessm.Metrics.EventRecorderServer',
-            system_bus=True, stdout=subprocess.PIPE)
+        self.dbus_mock = \
+            self.spawn_server(self._METRICS_BUS_NAME, self._METRICS_OBJECT_PATH,
+                              self._METRICS_IFACE, system_bus=True,
+                              stdout=subprocess.PIPE)
 
-        self.interface_mock = dbus.Interface(self.dbus_con.get_object(
-            'com.endlessm.Metrics', '/com/endlessm/Metrics'),
-            dbusmock.MOCK_IFACE)
+        event_recorder_daemon_dbus_object = \
+            self.dbus_con.get_object(self._METRICS_BUS_NAME,
+                                     self._METRICS_OBJECT_PATH)
+        self.interface_mock = \
+            dbus.Interface(event_recorder_daemon_dbus_object,
+                           dbusmock.MOCK_IFACE)
 
         self.dbus_con.add_signal_receiver(self.handle_dbus_event_received,
-                                          signal_name='MethodCalled')
+                                          signal_name='MethodCalled',
+                                          dbus_interface=dbusmock.MOCK_IFACE,
+                                          bus_name=self._METRICS_BUS_NAME,
+                                          path=self._METRICS_OBJECT_PATH)
 
         self.interface_mock.AddMethod('', 'RecordSingularEvent', 'uayxbv', '', '')
         self.interface_mock.AddMethod('', 'RecordAggregateEvent', 'uayxxbv', '', '')
