@@ -90,7 +90,7 @@
 typedef struct EmtrEventRecorderPrivate
 {
   /*
-   * DBus doesn't support maybe types, so a boolean is used to indicate whether
+   * D-Bus doesn't support maybe types, so a boolean is used to indicate whether
    * the auxiliary_payload field should be ignored. A non-NULL auxiliary_payload
    * must be passed even when it will be ignored, and this is the arbitrary
    * variant that is used for that purpose.
@@ -173,7 +173,7 @@ emtr_event_recorder_init (EmtrEventRecorder *self)
   priv->empty_auxiliary_payload = g_variant_new_variant (unboxed_variant);
   g_variant_ref_sink (priv->empty_auxiliary_payload);
 
-  /* If getting the DBus connection fails, mark self as a no-op object. */
+  /* If getting the D-Bus connection fails, mark self as a no-op object. */
   GError *error = NULL;
   priv->dbus_proxy =
     emer_event_recorder_server_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
@@ -184,7 +184,7 @@ emtr_event_recorder_init (EmtrEventRecorder *self)
                                                        &error);
   if (priv->dbus_proxy == NULL)
     {
-      g_critical ("Unable to connect to the DBus event recorder server: %s",
+      g_critical ("Unable to connect to the D-Bus event recorder server: %s",
                   error->message);
       g_error_free (error);
       priv->recording_enabled = FALSE;
@@ -247,7 +247,7 @@ combine_event_id_with_key (uuid_t    event_id,
   return g_variant_new ("(aymv)", &event_id_builder, key);
 }
 
-/* Variants sent to DBus are not allowed to be NULL or maybe types. */
+/* Variants sent to D-Bus are not allowed to be NULL or maybe types. */
 static GVariant *
 get_time_with_maybe_variant (EmtrEventRecorder *self,
                              gint64             relative_time,
@@ -274,7 +274,7 @@ contains_maybe_variant (GVariant *variant)
   if (found_character != NULL)
     {
       g_critical ("Maybe type found in auxiliary payload. These are not "
-                  "compatible with DBus!");
+                  "compatible with D-Bus!");
       return TRUE;
     }
   return FALSE;
@@ -308,13 +308,13 @@ send_events_to_dbus_finish_callback (EmerEventRecorderServer *dbus_proxy,
 
   if (!success)
     {
-      g_warning ("Failed to send event to DBus client-side daemon: %s.",
+      g_warning ("Failed to send event to event recorder daemon: %s.",
                  error->message);
       g_error_free (error);
     }
 }
 
-/* Send either singular or aggregate event to DBus.
+/* Send either singular or aggregate event to D-Bus.
    num_events parameter is ignored if is_aggregate is FALSE. */
 static void
 send_events_to_dbus (EmtrEventRecorder *self,
@@ -332,7 +332,7 @@ send_events_to_dbus (EmtrEventRecorder *self,
   get_uuid_builder (parsed_event_id, &uuid_builder);
   GVariant *event_id_variant = g_variant_builder_end (&uuid_builder);
 
-  /* Variants sent to DBus are not allowed to be NULL or maybe types. */
+  /* Variants sent to D-Bus are not allowed to be NULL or maybe types. */
   gboolean has_payload = auxiliary_payload != NULL;
   GVariant *maybe_auxiliary_payload = has_payload ?
     g_variant_new_variant (auxiliary_payload) : priv->empty_auxiliary_payload;
@@ -628,7 +628,7 @@ emtr_event_recorder_get_default (void)
  * place
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
  * the event. Must not contain maybe variants as they are not compatible with
- * DBus.
+ * D-Bus.
  *
  * Make a best-effort to record the fact that an event of type @event_id
  * happened at the current time. Optionally, associate arbitrary data,
@@ -757,7 +757,7 @@ emtr_event_recorder_record_event_sync (EmtrEventRecorder *self,
  * @num_events: (in): the number of times the event type took place
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
  * the events. Must not contain maybe variants as they are not compatible with
- * DBus.
+ * D-Bus.
  *
  * Make a best-effort to record the fact that @num_events events of type
  * @event_id happened between the current time and the previous such recording.
@@ -893,7 +893,7 @@ emtr_event_recorder_record_events_sync (EmtrEventRecorder *self,
  * event with the stop and any progress
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
  * the events. Must not contain maybe variants as they are not compatible with
- * DBus.
+ * D-Bus.
  *
  * Make a best-effort to record the fact that an event of type @event_id
  * started at the current time. The event's stop must be reported using
@@ -1031,7 +1031,7 @@ finally:
  * with the start, stop, and any other progress
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
  * the events. Must not contain maybe variants as they are not compatible with
- * DBus.
+ * D-Bus.
  *
  * Make a best-effort to record the fact that an event of type @event_id
  * progressed at the current time. May be called arbitrarily many times between
@@ -1147,7 +1147,7 @@ finally:
  * event with the start and any progress
  * @auxiliary_payload: (allow-none) (in): miscellaneous data to associate with
  * the events. Must not contain maybe variants as they are not compatible with
- * DBus.
+ * D-Bus.
  *
  * Make a best-effort to record the fact that an event of type @event_id
  * stopped at the current time. Behaves like emtr_event_recorder_record_start().

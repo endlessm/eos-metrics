@@ -332,7 +332,7 @@ test_event_recorder_record_auxiliary_payload_with_maybe_throws_critical (struct 
                                                                          gconstpointer           unused)
 {
   const gchar *error_message = "*Maybe type found in auxiliary payload. These "
-                               "are not compatible with DBus!*";
+                               "are not compatible with D-Bus!*";
 
   g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                          error_message);

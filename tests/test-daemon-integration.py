@@ -40,12 +40,12 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
     """
     Makes sure that the app-facing EosMetrics.EventRecorder interface calls
-    the com.endlessm.Metrics.EventRecorder DBus interface and marshals all its
+    the com.endlessm.Metrics.EventRecorder D-Bus interface and marshals all its
     arguments properly.
     """
     @classmethod
     def setUpClass(klass):
-        """Set up mainloop for blocking on D-Bus send events so that we can test 
+        """Set up mainloop for blocking on D-Bus send events so that we can test
         asynchronous calls."""
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
@@ -160,7 +160,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
                                              None, payload_stop)
         return self.interface_mock.GetCalls()
 
-    ### Recorder calls D-BUS at all. ###
+    ### Recorder calls D-Bus at all. ###
     def test_record_singular_event_calls_dbus(self):
         calls = self.call_singular_event()
         self.assertEqual(len(calls), 1)
@@ -183,7 +183,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
     def test_record_event_sequence_calls_dbus(self):
         calls = self.call_start_stop_event()
-        self.assertEqual(len(calls), 1) # Dbus is only called from "stop".
+        self.assertEqual(len(calls), 1) # D-Bus is only called from "stop".
         self.assertEqual(calls[0][1], 'RecordEventSequence')
 
     def test_record_event_sequence_sync_calls_dbus(self):
