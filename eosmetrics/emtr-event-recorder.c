@@ -664,7 +664,8 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
 
   g_return_if_fail (EMTR_IS_EVENT_RECORDER (self));
   g_return_if_fail (event_id != NULL);
-  g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
+  g_return_if_fail (auxiliary_payload == NULL ||
+                    _IS_VARIANT (auxiliary_payload));
 
   if (contains_maybe_variant (auxiliary_payload))
     return;
@@ -796,7 +797,8 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
 
   g_return_if_fail (EMTR_IS_EVENT_RECORDER (self));
   g_return_if_fail (event_id != NULL);
-  g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
+  g_return_if_fail (auxiliary_payload == NULL ||
+                    _IS_VARIANT (auxiliary_payload));
 
   if (contains_maybe_variant (auxiliary_payload))
     return;
@@ -915,14 +917,14 @@ emtr_event_recorder_record_events_sync (EmtrEventRecorder *self,
  *
  * At the discretion of the metrics system, the event may be discarded before
  * being reported to the metrics server. However, an event start, the
- * corresponding stop, and any corresponding progress either will be delivered or
- * dropped atomically. The event may take arbitrarily long to reach the server
- * and may be persisted unencrypted on the client for arbitrarily long. There is
- * no guarantee that the event is delivered via the network; for example, it may
- * instead be delivered manually on a USB drive. No indication of successful or
- * failed delivery is provided, and no application should rely on successful
- * delivery. The event will not be aggregated with other events before reaching
- * the server.
+ * corresponding stop, and any corresponding progress either will be delivered
+ * or dropped atomically. The event may take arbitrarily long to reach the
+ * server and may be persisted unencrypted on the client for arbitrarily long.
+ * There is no guarantee that the event is delivered via the network; for
+ * example, it may instead be delivered manually on a USB drive. No indication
+ * of successful or failed delivery is provided, and no application should rely
+ * on successful delivery. The event will not be aggregated with other events
+ * before reaching the server.
  */
 void
 emtr_event_recorder_record_start (EmtrEventRecorder *self,

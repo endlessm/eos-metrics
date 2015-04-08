@@ -104,7 +104,8 @@ gboolean emtr_event_id_to_name (const gchar  *event_id,
 /**
  * EMTR_EVENT_SHELL_APP_ADDED:
  *
- * Occurs when an application is installed, aka is added to the desktop's app grid.
+ * Occurs when an application is installed, aka is added to the desktop's app
+ * grid.
  *
  * Deprecated: 0.4: This event type is now defined in js/ui/shellDBus.js in the
  * eos-desktop repo.
@@ -114,9 +115,9 @@ gboolean emtr_event_id_to_name (const gchar  *event_id,
 /**
  * EMTR_EVENT_SHELL_APP_REMOVED:
  *
- * Occurs when an application is uninstalled, aka is removed from the desktop's app
- * grid. This can happen via uninstalling in the app store or dragging / dropping an app to the
- * trash.
+ * Occurs when an application is uninstalled, aka is removed from the desktop's
+ * app grid. This can happen via uninstalling in the app store or
+ * dragging / dropping an app to the trash.
  *
  * Deprecated: 0.4: This event type is now defined in js/ui/iconGridLayout.js in
  * the eos-desktop repo.
