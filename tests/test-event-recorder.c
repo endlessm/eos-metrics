@@ -180,11 +180,11 @@ test_event_recorder_record_progress_with_floating_key (struct RecorderFixture *f
                                                        gconstpointer           unused)
 {
   emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT,
-                                    g_variant_new ("mv", NULL), NULL);
+                                    g_variant_new ("()"), NULL);
   emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT,
-                                       g_variant_new ("mv", NULL), NULL);
+                                       g_variant_new ("()"), NULL);
   emtr_event_recorder_record_stop (fixture->recorder, MEANINGLESS_EVENT,
-                                   g_variant_new ("mv", NULL), NULL);
+                                   g_variant_new ("()"), NULL);
 }
 
 static void
