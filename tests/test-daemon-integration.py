@@ -16,15 +16,14 @@
 # License along with eos-metrics.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-import os
 import dbus
-import dbus.mainloop.glib
-import subprocess
-import unittest
-import time
-import uuid
-
 import dbusmock
+import dbus.mainloop.glib
+import os
+import subprocess
+import time
+import unittest
+import uuid
 
 from gi.repository import EosMetrics
 from gi.repository import GLib
