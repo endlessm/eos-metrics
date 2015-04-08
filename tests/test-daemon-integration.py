@@ -283,8 +283,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_aggregate_event()
         first_time = calls[0][2][3]
         self.interface_mock.ClearCalls()
-        self.call_aggregate_event()
-        calls = self.interface_mock.GetCalls()
+        calls = self.call_aggregate_event()
         second_time = calls[0][2][3]
         self.assertLessEqual(first_time, second_time)
 
