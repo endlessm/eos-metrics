@@ -79,6 +79,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.event_recorder = EosMetrics.EventRecorder()
         self.interface_mock.ClearCalls()
         self.mainloop = GLib.MainLoop()
+        self._quit_on_method = ''
 
     def tearDown(self):
         self.dbus_con.remove_signal_receiver(self.handle_dbus_event_received,
@@ -86,22 +87,38 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.dbus_mock.terminate()
         self.dbus_mock.wait()
 
+    def quit_on(self, method_name):
+        """Quit the main loop when the D-Bus method @method_name is called.
+        Timeout after waiting for 20 seconds. Use like this:
+            self.quit_on('MyMethod')
+            self.mainloop.run()
+            # now MyMethod has been called
+        """
+        self._quit_on_method = method_name
+        GLib.timeout_add_seconds(20, self.fail, 'Test timed out after ' +
+                                 'waiting 20 seconds for D-Bus method call.')
+
     def handle_dbus_event_received(self, name, *args):
-        self.mainloop.quit()
+        if name == self._quit_on_method:
+            self._quit_on_method = ''
+            self.mainloop.quit()
 
     def call_singular_event(self, payload=None):
         self.event_recorder.record_event(self._MOCK_EVENT_NOTHING_HAPPENED, payload)
+        self.quit_on('RecordSingularEvent')
         self.mainloop.run()
         return self.interface_mock.GetCalls()
 
     def call_aggregate_event(self, num_events=2, payload=None):
         self.event_recorder.record_events(self._MOCK_EVENT_NOTHING_HAPPENED, num_events, payload)
+        self.quit_on('RecordAggregateEvent')
         self.mainloop.run()
         return self.interface_mock.GetCalls()
 
     def call_start_stop_event(self, payload_start=None, payload_stop=None):
         self.event_recorder.record_start(self._MOCK_EVENT_NOTHING_HAPPENED, None, payload_start)
         self.event_recorder.record_stop(self._MOCK_EVENT_NOTHING_HAPPENED, None, payload_stop)
+        self.quit_on('RecordEventSequence')
         self.mainloop.run()
         return self.interface_mock.GetCalls()
 
@@ -109,6 +126,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.event_recorder.record_start(self._MOCK_EVENT_NOTHING_HAPPENED, None, payload_start)
         self.event_recorder.record_progress(self._MOCK_EVENT_NOTHING_HAPPENED, None, payload_progress)
         self.event_recorder.record_stop(self._MOCK_EVENT_NOTHING_HAPPENED, None, payload_stop)
+        self.quit_on('RecordEventSequence')
         self.mainloop.run()
         return self.interface_mock.GetCalls()
 
