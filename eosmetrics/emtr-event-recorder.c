@@ -142,7 +142,7 @@ general_variant_hash (gconstpointer key)
   const gchar *type_string = g_variant_get_type_string (variant);
   guint hash_value = g_str_hash (type_string);
   GBytes *serialized_data = g_variant_get_data_as_bytes (variant);
-  if (G_LIKELY (serialized_data != NULL))
+  if (serialized_data != NULL)
     {
       hash_value = (hash_value * 33) + g_bytes_hash (serialized_data);
       g_bytes_unref (serialized_data);
@@ -199,7 +199,7 @@ parse_event_id (const gchar *unparsed_event_id,
                 uuid_t       parsed_event_id)
 {
   int parse_failed = uuid_parse (unparsed_event_id, parsed_event_id);
-  if (G_UNLIKELY (parse_failed != 0))
+  if (parse_failed != 0)
     {
       g_warning ("Attempt to parse UUID \"%s\" failed. Make sure you created "
                  "this UUID with uuidgen -r. You may need to sudo apt-get "
