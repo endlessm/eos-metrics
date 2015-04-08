@@ -160,21 +160,24 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_start_stop_event()
         self.assertEqual(calls[0][2][0], os.getuid())
 
+    def dbus_bytes_to_python_bytes(self, dbus_byte_array):
+        bytes_as_chars = map(chr, dbus_byte_array)
+        return ''.join(bytes_as_chars)
 
     ### Event Id is't garbled. ###
     def test_record_singular_event_passes_event_id(self):
         calls = self.call_singular_event()
-        actual_bytes = "".join(map(chr, calls[0][2][1]))
+        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
         self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
 
     def test_record_aggregate_event_passes_event_id(self):
         calls = self.call_aggregate_event()
-        actual_bytes = "".join(map(chr, calls[0][2][1]))
+        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
         self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
 
     def test_record_event_sequence_passes_event_id(self):
         calls = self.call_start_stop_event()
-        actual_bytes = "".join(map(chr, calls[0][2][1]))
+        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
         self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
 
 
