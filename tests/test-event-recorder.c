@@ -207,10 +207,8 @@ test_event_recorder_record_progress_with_key (struct RecorderFixture *fixture,
   emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT, key,
                                     NULL);
   for (gint i = 0; i < 10; ++i)
-   {
     emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT, key,
                                          NULL);
-   }
   emtr_event_recorder_record_stop (fixture->recorder, MEANINGLESS_EVENT, key,
                                    NULL);
   g_variant_unref (key);
