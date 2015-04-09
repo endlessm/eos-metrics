@@ -104,11 +104,27 @@ test_event_recorder_record_event (struct RecorderFixture *fixture,
 }
 
 static void
+test_event_recorder_record_event_sync (struct RecorderFixture *fixture,
+                                       gconstpointer           unused)
+{
+  emtr_event_recorder_record_event_sync (fixture->recorder, MEANINGLESS_EVENT,
+    NULL);
+}
+
+static void
 test_event_recorder_record_events (struct RecorderFixture *fixture,
                                    gconstpointer           unused)
 {
   emtr_event_recorder_record_events (fixture->recorder, MEANINGLESS_EVENT,
                                      G_GINT64_CONSTANT (12), NULL);
+}
+
+static void
+test_event_recorder_record_events_sync (struct RecorderFixture *fixture,
+                                        gconstpointer           unused)
+{
+  emtr_event_recorder_record_events_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                          G_GINT64_CONSTANT (8), NULL);
 }
 
 static void
@@ -119,6 +135,16 @@ test_event_recorder_record_start_stop (struct RecorderFixture *fixture,
                                     NULL);
   emtr_event_recorder_record_stop (fixture->recorder, MEANINGLESS_EVENT, NULL,
                                    NULL);
+}
+
+static void
+test_event_recorder_record_start_stop_sync (struct RecorderFixture *fixture,
+                                            gconstpointer           unused)
+{
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT, NULL,
+                                    NULL);
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                        NULL, NULL);
 }
 
 static void
@@ -134,6 +160,18 @@ test_event_recorder_record_progress (struct RecorderFixture *fixture,
 }
 
 static void
+test_event_recorder_record_progress_sync (struct RecorderFixture *fixture,
+                                          gconstpointer           unused)
+{
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT, NULL,
+                                    NULL);
+  emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT, NULL,
+                                       NULL);
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                        NULL, NULL);
+}
+
+static void
 test_event_recorder_record_start_stop_with_key (struct RecorderFixture *fixture,
                                                 gconstpointer           unused)
 {
@@ -143,6 +181,19 @@ test_event_recorder_record_start_stop_with_key (struct RecorderFixture *fixture,
                                     NULL);
   emtr_event_recorder_record_stop (fixture->recorder, MEANINGLESS_EVENT, key,
                                    NULL);
+  g_variant_unref (key);
+}
+
+static void
+test_event_recorder_record_start_stop_sync_with_key (struct RecorderFixture *fixture,
+                                                     gconstpointer           unused)
+{
+  GVariant *key = g_variant_new ("v", g_variant_new ("(xb)", -12, FALSE));
+  g_variant_ref_sink (key);
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT, key,
+                                    NULL);
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                        key, NULL);
   g_variant_unref (key);
 }
 
@@ -166,6 +217,22 @@ test_event_recorder_record_progress_with_key (struct RecorderFixture *fixture,
 }
 
 static void
+test_event_recorder_record_progress_sync_with_key (struct RecorderFixture *fixture,
+                                                   gconstpointer           unused)
+{
+  GVariant *key = g_variant_new ("t", G_GUINT64_CONSTANT (7894013289701324));
+  g_variant_ref_sink (key);
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT, key,
+                                    NULL);
+  for (gint i = 0; i < 4; ++i)
+    emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT,
+                                         key, NULL);
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                        key, NULL);
+  g_variant_unref (key);
+}
+
+static void
 test_event_recorder_record_start_stop_with_floating_key (struct RecorderFixture *fixture,
                                                          gconstpointer           unused)
 {
@@ -173,6 +240,16 @@ test_event_recorder_record_start_stop_with_floating_key (struct RecorderFixture 
                                     g_variant_new ("i", 6170), NULL);
   emtr_event_recorder_record_stop (fixture->recorder, MEANINGLESS_EVENT,
                                    g_variant_new ("i", 6170), NULL);
+}
+
+static void
+test_event_recorder_record_start_stop_sync_with_floating_key (struct RecorderFixture *fixture,
+                                                              gconstpointer           unused)
+{
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT,
+                                    g_variant_new ("b", FALSE), NULL);
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                        g_variant_new ("b", FALSE), NULL);
 }
 
 static void
@@ -188,14 +265,31 @@ test_event_recorder_record_progress_with_floating_key (struct RecorderFixture *f
 }
 
 static void
+test_event_recorder_record_progress_sync_with_floating_key (struct RecorderFixture *fixture,
+                                                            gconstpointer           unused)
+{
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT,
+                                    g_variant_new ("d", 0.3), NULL);
+  emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT,
+                                       g_variant_new ("d", 0.3), NULL);
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                        g_variant_new ("d", 0.3), NULL);
+}
+
+static void
 test_event_recorder_record_auxiliary_payload (struct RecorderFixture *fixture,
                                               gconstpointer           unused)
 {
   emtr_event_recorder_record_event (fixture->recorder, MEANINGLESS_EVENT,
                                     g_variant_new ("b", TRUE));
+  emtr_event_recorder_record_event_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                         g_variant_new ("q", 32u));
   emtr_event_recorder_record_events (fixture->recorder, MEANINGLESS_EVENT,
                                      G_GINT64_CONSTANT (7),
                                      g_variant_new ("b", FALSE));
+  emtr_event_recorder_record_events_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                          G_GINT64_CONSTANT (7),
+                                          g_variant_new ("n", -9));
   emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT, NULL,
                                     g_variant_new ("d", 5812.512));
   emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT, NULL,
@@ -204,6 +298,14 @@ test_event_recorder_record_auxiliary_payload (struct RecorderFixture *fixture,
                                        g_variant_new ("(xt)",
                                        G_GINT64_CONSTANT (-82),
                                        G_GUINT64_CONSTANT (19)));
+
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT, NULL,
+                                    g_variant_new ("(s)", "Gingerbread"));
+  emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT, NULL,
+                                       g_variant_new ("(ss)", "Cookies", "On"));
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT, NULL,
+                                        g_variant_new ("(ssss)",
+                                                       "F", "I", "R", "E"));
 }
 
 static void
@@ -222,8 +324,8 @@ test_event_recorder_record_multiple_metric_sequences (struct RecorderFixture *fi
                                        NULL);
   emtr_event_recorder_record_stop (fixture->recorder, MEANINGLESS_EVENT_2, key,
                                    NULL);
-  emtr_event_recorder_record_stop (fixture->recorder, MEANINGLESS_EVENT, key,
-                                   NULL);
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT, key,
+                                        NULL);
   g_variant_unref (key);
 }
 
@@ -242,9 +344,22 @@ test_event_recorder_record_auxiliary_payload_with_maybe_throws_critical (struct 
 
   g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                          error_message);
+  emtr_event_recorder_record_event_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                         g_variant_new ("mv", NULL));
+  g_test_assert_expected_messages ();
+
+  g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                         error_message);
   emtr_event_recorder_record_events (fixture->recorder, MEANINGLESS_EVENT,
                                      G_GINT64_CONSTANT (7),
                                      g_variant_new ("mb", NULL));
+  g_test_assert_expected_messages ();
+
+  g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                         error_message);
+  emtr_event_recorder_record_events_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                          G_GINT64_CONSTANT (7),
+                                          g_variant_new ("mi", 73));
   g_test_assert_expected_messages ();
 
   g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
@@ -266,6 +381,12 @@ test_event_recorder_record_auxiliary_payload_with_maybe_throws_critical (struct 
                                                   G_GINT64_CONSTANT (-82),
                                                   G_GUINT64_CONSTANT (19)));
   g_test_assert_expected_messages ();
+
+  g_test_expect_message (EOS_METRICS_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                         error_message);
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                        NULL, g_variant_new ("ms", "Donatello"));
+  g_test_assert_expected_messages ();
 }
 
 int
@@ -283,20 +404,36 @@ main (int    argc,
                    test_event_recorder_get_default_is_singleton);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-event",
                           test_event_recorder_record_event);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-event-sync",
+                          test_event_recorder_record_event_sync);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-events",
                           test_event_recorder_record_events);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-events-sync",
+                          test_event_recorder_record_events_sync);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-start-stop",
                           test_event_recorder_record_start_stop);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-start-stop-sync",
+                          test_event_recorder_record_start_stop_sync);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-progress",
                           test_event_recorder_record_progress);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-progress-sync",
+                          test_event_recorder_record_progress_sync);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-start-stop-with-key",
                           test_event_recorder_record_start_stop_with_key);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-start-stop-sync-with-key",
+                          test_event_recorder_record_start_stop_sync_with_key);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-progress-with-key",
                           test_event_recorder_record_progress_with_key);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-progress-sync-with-key",
+                          test_event_recorder_record_progress_sync_with_key);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-start-stop-with-floating-key",
                           test_event_recorder_record_start_stop_with_floating_key);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-start-stop-sync-with-floating-key",
+                          test_event_recorder_record_start_stop_sync_with_floating_key);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-progress-with-floating-key",
                           test_event_recorder_record_progress_with_floating_key);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-progress-sync-with-floating-key",
+                          test_event_recorder_record_progress_sync_with_floating_key);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-auxiliary-payload",
                           test_event_recorder_record_auxiliary_payload);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-multiple-metric-sequences",

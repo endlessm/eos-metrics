@@ -109,10 +109,20 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.mainloop.run()
         return self.interface_mock.GetCalls()
 
+    def call_singular_event_sync(self, payload=None):
+        self.event_recorder.record_event_sync(self._MOCK_EVENT_NOTHING_HAPPENED,
+                                              payload)
+        return self.interface_mock.GetCalls()
+
     def call_aggregate_event(self, num_events=2, payload=None):
         self.event_recorder.record_events(self._MOCK_EVENT_NOTHING_HAPPENED, num_events, payload)
         self.quit_on('RecordAggregateEvent')
         self.mainloop.run()
+        return self.interface_mock.GetCalls()
+
+    def call_aggregate_event_sync(self, num_events=2, payload=None):
+        self.event_recorder.record_events_sync(self._MOCK_EVENT_NOTHING_HAPPENED,
+                                               num_events, payload)
         return self.interface_mock.GetCalls()
 
     def call_start_stop_event(self, payload_start=None, payload_stop=None):
@@ -120,6 +130,14 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.event_recorder.record_stop(self._MOCK_EVENT_NOTHING_HAPPENED, None, payload_stop)
         self.quit_on('RecordEventSequence')
         self.mainloop.run()
+        return self.interface_mock.GetCalls()
+
+    def call_start_stop_event_sync(self, payload_start=None,
+                                   payload_stop=None):
+        self.event_recorder.record_start(self._MOCK_EVENT_NOTHING_HAPPENED,
+                                         None, payload_start)
+        self.event_recorder.record_stop_sync(self._MOCK_EVENT_NOTHING_HAPPENED,
+                                             None, payload_stop)
         return self.interface_mock.GetCalls()
 
     def call_start_progress_stop_event(self, payload_start=None, payload_progress=None, payload_stop=None):
@@ -130,9 +148,26 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.mainloop.run()
         return self.interface_mock.GetCalls()
 
+    def call_start_progress_stop_event_sync(self,
+                                            payload_start=None,
+                                            payload_progress=None,
+                                            payload_stop=None):
+        self.event_recorder.record_start(self._MOCK_EVENT_NOTHING_HAPPENED,
+                                         None, payload_start)
+        self.event_recorder.record_progress(self._MOCK_EVENT_NOTHING_HAPPENED,
+                                            None, payload_progress)
+        self.event_recorder.record_stop_sync(self._MOCK_EVENT_NOTHING_HAPPENED,
+                                             None, payload_stop)
+        return self.interface_mock.GetCalls()
+
     ### Recorder calls D-BUS at all. ###
     def test_record_singular_event_calls_dbus(self):
         calls = self.call_singular_event()
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0][1], 'RecordSingularEvent')
+
+    def test_record_singular_event_sync_calls_dbus(self):
+        calls = self.call_singular_event_sync()
         self.assertEqual(len(calls), 1)
         self.assertEqual(calls[0][1], 'RecordSingularEvent')
 
@@ -141,23 +176,44 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.assertEqual(len(calls), 1)
         self.assertEqual(calls[0][1], 'RecordAggregateEvent')
 
+    def test_record_aggregate_event_sync_calls_dbus(self):
+        calls = self.call_aggregate_event_sync()
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0][1], 'RecordAggregateEvent')
+
     def test_record_event_sequence_calls_dbus(self):
         calls = self.call_start_stop_event()
         self.assertEqual(len(calls), 1) # Dbus is only called from "stop".
         self.assertEqual(calls[0][1], 'RecordEventSequence')
 
+    def test_record_event_sequence_sync_calls_dbus(self):
+        calls = self.call_start_stop_event_sync()
+        self.assertEqual(len(calls), 1)  # D-Bus is only called from "stop".
+        self.assertEqual(calls[0][1], 'RecordEventSequence')
 
     ### User Id isn't garbled. ###
     def test_record_singular_event_passes_uid(self):
         calls = self.call_singular_event()
         self.assertEqual(calls[0][2][0], os.getuid())
 
+    def test_record_singular_event_sync_passes_uid(self):
+        calls = self.call_singular_event_sync()
+        self.assertEqual(calls[0][2][0], os.getuid())
+
     def test_record_aggregate_event_passes_uid(self):
         calls = self.call_aggregate_event()
         self.assertEqual(calls[0][2][0], os.getuid())
 
+    def test_record_aggregate_event_sync_passes_uid(self):
+        calls = self.call_aggregate_event_sync()
+        self.assertEqual(calls[0][2][0], os.getuid())
+
     def test_record_event_sequence_passes_uid(self):
         calls = self.call_start_stop_event()
+        self.assertEqual(calls[0][2][0], os.getuid())
+
+    def test_record_event_sequence_sync_passes_uid(self):
+        calls = self.call_start_stop_event_sync()
         self.assertEqual(calls[0][2][0], os.getuid())
 
     def dbus_bytes_to_python_bytes(self, dbus_byte_array):
@@ -170,8 +226,18 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
         self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
 
+    def test_record_singular_event_sync_passes_event_id(self):
+        calls = self.call_singular_event_sync()
+        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
+
     def test_record_aggregate_event_passes_event_id(self):
         calls = self.call_aggregate_event()
+        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
+
+    def test_record_aggregate_event_sync_passes_event_id(self):
+        calls = self.call_aggregate_event_sync()
         actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
         self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
 
@@ -180,6 +246,10 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
         self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
 
+    def test_record_event_sequence_sync_passes_event_id(self):
+        calls = self.call_start_stop_event_sync()
+        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
 
     ### Aggregated events' count isn't garbled. ###
     def test_record_aggregate_event_passes_event_count(self):
@@ -187,6 +257,10 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_aggregate_event(num_events=leet_count)
         self.assertEqual(calls[0][2][2], leet_count)
 
+    def test_record_aggregate_event_sync_passes_event_count(self):
+        leet_count = 1337
+        calls = self.call_aggregate_event_sync(num_events=leet_count)
+        self.assertEqual(calls[0][2][2], leet_count)
 
     ### Timestamps are monotonically increasing. ###
     def test_record_singular_event_has_increasing_relative_timestamp(self):
@@ -197,12 +271,28 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         second_time = calls[0][2][2]
         self.assertLessEqual(first_time, second_time)
 
+    def test_record_singular_event_sync_has_increasing_relative_timestamp(self):
+        calls = self.call_singular_event_sync()
+        first_time = calls[0][2][2]
+        self.interface_mock.ClearCalls()
+        calls = self.call_singular_event_sync()
+        second_time = calls[0][2][2]
+        self.assertLessEqual(first_time, second_time)
+
     def test_record_aggregate_event_has_increasing_relative_timestamp(self):
         calls = self.call_aggregate_event()
         first_time = calls[0][2][3]
         self.interface_mock.ClearCalls()
         self.call_aggregate_event()
         calls = self.interface_mock.GetCalls()
+        second_time = calls[0][2][3]
+        self.assertLessEqual(first_time, second_time)
+
+    def test_record_aggregate_event_sync_has_increasing_relative_timestamp(self):
+        calls = self.call_aggregate_event_sync()
+        first_time = calls[0][2][3]
+        self.interface_mock.ClearCalls()
+        calls = self.call_aggregate_event_sync()
         second_time = calls[0][2][3]
         self.assertLessEqual(first_time, second_time)
 
@@ -218,6 +308,17 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.assertLessEqual(second_time, third_time)
         self.assertLessEqual(third_time, fourth_time)
 
+    def test_record_event_sequence_sync_has_increasing_relative_timestamp(self):
+        calls = self.call_start_stop_event_sync()
+        first_time = calls[0][2][2][0][0]
+        second_time = calls[0][2][2][1][0]
+        self.interface_mock.ClearCalls()
+        calls = self.call_start_stop_event_sync()
+        third_time = calls[0][2][2][0][0]
+        fourth_time = calls[0][2][2][1][0]
+        self.assertLessEqual(first_time, second_time)
+        self.assertLessEqual(second_time, third_time)
+        self.assertLessEqual(third_time, fourth_time)
 
     ### The difference between two relative timestamps is non-negative and
     ### less than that of two surrounding absolute timestamps.
@@ -237,6 +338,24 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         absolute_time_difference = (absolute_time_second - absolute_time_first) * self._NANOSECONDS_PER_SECOND
         self.assertLessEqual(relative_time_difference, absolute_time_difference)
 
+    def test_record_singular_event_sync_has_reasonable_relative_timestamp(self):
+        absolute_time_first = time.time()
+
+        calls = self.call_singular_event_sync()
+        relative_time_first = calls[0][2][2]
+        self.interface_mock.ClearCalls()
+        calls = self.call_singular_event_sync()
+        relative_time_second = calls[0][2][2]
+
+        absolute_time_second = time.time()
+
+        relative_time_difference = relative_time_second - relative_time_first
+        self.assertLessEqual(0, relative_time_difference)
+        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+            (absolute_time_second - absolute_time_first)
+        self.assertLessEqual(relative_time_difference,
+                             absolute_time_difference)
+
     def test_record_aggregate_event_has_reasonable_relative_timestamp(self):
         absolute_time_first = time.time()
 
@@ -252,6 +371,24 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.assertLessEqual(0, relative_time_difference)
         absolute_time_difference = (absolute_time_second - absolute_time_first) * self._NANOSECONDS_PER_SECOND
         self.assertLessEqual(relative_time_difference, absolute_time_difference)
+
+    def test_record_aggregate_event_sync_has_reasonable_relative_timestamp(self):
+        absolute_time_first = time.time()
+
+        calls = self.call_aggregate_event_sync()
+        relative_time_first = calls[0][2][3]
+        self.interface_mock.ClearCalls()
+        calls = self.call_aggregate_event_sync()
+        relative_time_second = calls[0][2][3]
+
+        absolute_time_second = time.time()
+
+        relative_time_difference = relative_time_second - relative_time_first
+        self.assertLessEqual(0, relative_time_difference)
+        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+            (absolute_time_second - absolute_time_first)
+        self.assertLessEqual(relative_time_difference,
+                             absolute_time_difference)
 
     def test_record_event_sequence_has_reasonable_relative_timestamp(self):
         absolute_time_first = time.time()
@@ -270,14 +407,39 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         absolute_time_difference = (absolute_time_second - absolute_time_first) * self._NANOSECONDS_PER_SECOND
         self.assertLessEqual(relative_time_difference, absolute_time_difference)
 
+    def test_record_event_sequence_sync_has_reasonable_relative_timestamp(self):
+        absolute_time_first = time.time()
+
+        calls = self.call_start_stop_event_sync()
+        relative_time_first = calls[0][2][2][0][0]
+        self.interface_mock.ClearCalls()
+        calls = self.call_start_stop_event_sync()
+        relative_time_second = calls[0][2][2][1][0]
+
+        absolute_time_second = time.time()
+
+        relative_time_difference = relative_time_second - relative_time_first
+        self.assertLessEqual(0, relative_time_difference)
+        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+            (absolute_time_second - absolute_time_first)
+        self.assertLessEqual(relative_time_difference,
+                             absolute_time_difference)
 
     ### The maybe type is emulated correctly for empty payloads. ###
     def test_record_singular_event_maybe_flag_is_false_when_payload_is_empty(self):
         calls = self.call_singular_event(payload=None)
         self.assertEqual(calls[0][2][3], False)
 
+    def test_record_singular_event_sync_maybe_flag_is_false_when_payload_is_empty(self):
+        calls = self.call_singular_event_sync(payload=None)
+        self.assertEqual(calls[0][2][3], False)
+
     def test_record_aggregate_event_maybe_flag_is_false_when_payload_is_empty(self):
         calls = self.call_aggregate_event(payload=None)
+        self.assertEqual(calls[0][2][4], False)
+
+    def test_record_aggregate_event_sync_maybe_flag_is_false_when_payload_is_empty(self):
+        calls = self.call_aggregate_event_sync(payload=None)
         self.assertEqual(calls[0][2][4], False)
 
     def test_record_event_sequence_maybe_flags_are_false_when_payloads_are_empty(self):
@@ -286,6 +448,11 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.assertEqual(calls[0][2][2][1][1], False)
         self.assertEqual(calls[0][2][2][2][1], False)
 
+    def test_record_event_sequence_sync_maybe_flags_are_false_when_payloads_are_empty(self):
+        calls = self.call_start_progress_stop_event_sync()
+        self.assertEqual(calls[0][2][2][0][1], False)
+        self.assertEqual(calls[0][2][2][1][1], False)
+        self.assertEqual(calls[0][2][2][2][1], False)
 
    ### The maybe type is emulated correctly for non-empty payloads. ###
     def test_record_singluar_event_maybe_flag_is_true_when_payload_is_not_empty(self):
@@ -293,9 +460,19 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_singular_event(payload=GLib.Variant.new_string("Quantum Dalio"))
         self.assertEqual(calls[0][2][3], True)
 
+    def test_record_singluar_event_sync_maybe_flag_is_true_when_payload_is_not_empty(self):
+        payload = GLib.Variant.new_string("Schrodinger's Ghost")
+        calls = self.call_singular_event_sync(payload=payload)
+        self.assertEqual(calls[0][2][3], True)
+
     def test_record_aggregate_event_maybe_flag_is_true_when_payload_is_not_empty(self):
         # Let's be serious, when is the last time *you* saw a fiscally responsible mime?
         calls = self.call_aggregate_event(payload=GLib.Variant.new_string("Fiscally Responsible Mime"))
+        self.assertEqual(calls[0][2][4], True)
+
+    def test_record_aggregate_event_sync_maybe_flag_is_true_when_payload_is_not_empty(self):
+        payload = GLib.Variant.new_string("MIME Type: Fiscally Responsible")
+        calls = self.call_aggregate_event_sync(payload=payload)
         self.assertEqual(calls[0][2][4], True)
 
     def test_record_event_sequence_maybe_flag_is_true_when_payload_is_not_empty(self):
@@ -307,6 +484,17 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.assertEqual(calls[0][2][2][1][1], True)
         self.assertEqual(calls[0][2][2][2][1], True)
 
+    def test_record_event_sequence_sync_maybe_flag_is_true_when_payload_is_not_empty(self):
+        payload_start = GLib.Variant.new_string("Jimminy Cricket")
+        payload_progress = GLib.Variant.new_string("Had a bad day")
+        payload_stop = GLib.Variant.new_string("What was he thinking?")
+        calls = self.call_start_progress_stop_event_sync(payload_start,
+                                                         payload_progress,
+                                                         payload_stop)
+
+        self.assertEqual(calls[0][2][2][0][1], True)
+        self.assertEqual(calls[0][2][2][1][1], True)
+        self.assertEqual(calls[0][2][2][2][1], True)
 
     ### The payloads are not garbled. ###
     def test_record_singular_event_passes_payload(self):
@@ -315,11 +503,23 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_singular_event(payload=GLib.Variant.new_string("Occam's Razor"))
         self.assertEqual(calls[0][2][4], logic_string)
 
+    def test_record_singular_event_sync_passes_payload(self):
+        string = "Occam's Shaving Cream"
+        payload = GLib.Variant.new_string(string)
+        calls = self.call_singular_event_sync(payload=payload)
+        self.assertEqual(calls[0][2][4], string)
+
     def test_record_aggregate_event_passes_payload(self):
         rupert_string = "Prince Rupert's Drop"
         # If you haven't seen this, you need to.
         calls = self.call_aggregate_event(payload=GLib.Variant.new_string(rupert_string))
         self.assertEqual(calls[0][2][5], rupert_string)
+
+    def test_record_aggregate_event_sync_passes_payload(self):
+        string = "Hercules (1983)"
+        payload = GLib.Variant.new_string(string)
+        calls = self.call_aggregate_event_sync(payload=payload)
+        self.assertEqual(calls[0][2][5], string)
 
     def test_record_event_sequence_passes_payloads(self):
         start_string = "I am a jelly donut(sic)."
@@ -333,6 +533,21 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.assertEqual(calls[0][2][2][0][2], start_string)
         self.assertEqual(calls[0][2][2][1][2], progress_string)
         self.assertEqual(calls[0][2][2][2][2], end_string)
+
+    def test_record_event_sequence_sync_passes_payloads(self):
+        start_string = "What do you suggest?"
+        start_payload = GLib.Variant.new_string(start_string)
+        progress_string = "Do a barrel roll."
+        progress_payload = GLib.Variant.new_string(progress_string)
+        stop_string = "Don't mind if I do."
+        stop_payload = GLib.Variant.new_string(stop_string)
+        calls = self.call_start_progress_stop_event_sync(start_payload,
+                                                         progress_payload,
+                                                         stop_payload)
+
+        self.assertEqual(calls[0][2][2][0][2], start_string)
+        self.assertEqual(calls[0][2][2][1][2], progress_string)
+        self.assertEqual(calls[0][2][2][2][2], stop_string)
 
 
 if __name__ == '__main__':
