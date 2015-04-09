@@ -394,7 +394,6 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         calls = self.call_start_stop_event()
         relative_time_first = calls[0][2][2][0][0]
-
         self.interface_mock.ClearCalls()
         calls = self.call_start_stop_event()
         relative_time_second = calls[0][2][2][1][0]
