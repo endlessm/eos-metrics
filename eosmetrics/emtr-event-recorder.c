@@ -702,6 +702,9 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
   EmtrEventRecorderPrivate *priv =
     emtr_event_recorder_get_instance_private (self);
 
+  if (!priv->recording_enabled)
+    return;
+
   /* Acquire this lock before getting the time so that event sequences are
      guaranteed to be chronologically sorted. */
   g_mutex_lock (&(priv->events_by_id_with_key_lock));
@@ -713,9 +716,6 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
       g_critical ("Getting relative timestamp failed.");
       goto finally;
     }
-
-  if (!priv->recording_enabled)
-    goto finally;
 
   uuid_t parsed_event_id;
   if (!parse_event_id (event_id, parsed_event_id))
@@ -820,6 +820,9 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
   EmtrEventRecorderPrivate *priv =
     emtr_event_recorder_get_instance_private (self);
 
+  if (!priv->recording_enabled)
+    return;
+
   /* Acquire this lock before getting the time so that event sequences are
      guaranteed to be chronologically sorted. */
   g_mutex_lock (&(priv->events_by_id_with_key_lock));
@@ -831,9 +834,6 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
       g_critical ("Getting relative timestamp failed.");
       goto finally;
     }
-
-  if (!priv->recording_enabled)
-    goto finally;
 
   uuid_t parsed_event_id;
   if (!parse_event_id (event_id, parsed_event_id))
@@ -938,6 +938,9 @@ emtr_event_recorder_record_stop (EmtrEventRecorder *self,
   EmtrEventRecorderPrivate *priv =
     emtr_event_recorder_get_instance_private (self);
 
+  if (!priv->recording_enabled)
+    return;
+
   /* Acquire this lock before getting the time so that event sequences are
      guaranteed to be chronologically sorted. */
   g_mutex_lock (&(priv->events_by_id_with_key_lock));
@@ -949,9 +952,6 @@ emtr_event_recorder_record_stop (EmtrEventRecorder *self,
       g_critical ("Getting relative timestamp failed.");
       goto finally;
     }
-
-  if (!priv->recording_enabled)
-    goto finally;
 
   uuid_t parsed_event_id;
   if (!parse_event_id (event_id, parsed_event_id))
