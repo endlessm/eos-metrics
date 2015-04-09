@@ -662,7 +662,7 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
       return;
     }
 
-  g_return_if_fail (self != NULL && EMTR_IS_EVENT_RECORDER (self));
+  g_return_if_fail (EMTR_IS_EVENT_RECORDER (self));
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
 
@@ -794,7 +794,7 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
       return;
     }
 
-  g_return_if_fail (self != NULL && EMTR_IS_EVENT_RECORDER (self));
+  g_return_if_fail (EMTR_IS_EVENT_RECORDER (self));
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (auxiliary_payload == NULL || _IS_VARIANT(auxiliary_payload));
 
@@ -932,7 +932,7 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
 {
   /* Validate inputs before acquiring the lock below to avoid verbose error
      handling that releases the lock and logs a custom error message. */
-  g_return_if_fail (self != NULL && EMTR_IS_EVENT_RECORDER (self));
+  g_return_if_fail (EMTR_IS_EVENT_RECORDER (self));
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (key == NULL || _IS_VARIANT (key));
   g_return_if_fail (auxiliary_payload == NULL ||
@@ -1046,7 +1046,7 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
 {
   /* Validate inputs before acquiring the lock below to avoid verbose error
      handling that releases the lock and logs a custom error message. */
-  g_return_if_fail (self != NULL && EMTR_IS_EVENT_RECORDER (self));
+  g_return_if_fail (EMTR_IS_EVENT_RECORDER (self));
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (key == NULL || _IS_VARIANT (key));
   g_return_if_fail (auxiliary_payload == NULL ||
@@ -1160,7 +1160,7 @@ emtr_event_recorder_record_stop (EmtrEventRecorder *self,
 {
   /* Validate inputs before acquiring the lock in record_stop to avoid verbose
      error handling that releases the lock and logs a custom error message. */
-  g_return_if_fail (self != NULL && EMTR_IS_EVENT_RECORDER (self));
+  g_return_if_fail (EMTR_IS_EVENT_RECORDER (self));
   g_return_if_fail (event_id != NULL);
   g_return_if_fail (key == NULL || _IS_VARIANT (key));
   g_return_if_fail (auxiliary_payload == NULL ||
