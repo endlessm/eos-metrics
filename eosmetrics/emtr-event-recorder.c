@@ -1008,6 +1008,7 @@ emtr_event_recorder_record_stop (EmtrEventRecorder *self,
 
   g_assert (g_hash_table_remove (priv->events_by_id_with_key,
                                  event_id_with_key));
+  g_variant_unref (event_id_with_key);
 
 finally:
   g_mutex_unlock (&(priv->events_by_id_with_key_lock));
