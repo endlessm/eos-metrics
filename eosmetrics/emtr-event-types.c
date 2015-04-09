@@ -33,6 +33,8 @@
  * contents of the out parameter will be set to a message indicating the error.
  *
  * Returns: A gboolean indicating success or failure.
+ *
+ * Deprecated: 0.4
  */
 gboolean
 emtr_event_id_to_name (const gchar  *event_id,

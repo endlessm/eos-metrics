@@ -460,13 +460,12 @@ emtr_event_recorder_get_default (void)
  * DBus.
  *
  * Make a best-effort to record the fact that an event of type @event_id
- * happened at the current time. emtr-event-types.h is the registry for event
- * IDs. Optionally, associate arbitrary data, @auxiliary_payload, with this
- * particular instance of the event. Under no circumstances should
- * personally-identifiable information be included in the @auxiliary_payload or
- * @event_id. Large auxiliary payloads dominate the size of the event and should
- * therefore be used sparingly. Events for which precise timing information is
- * not required should instead be recorded using
+ * happened at the current time. Optionally, associate arbitrary data,
+ * @auxiliary_payload, with this particular instance of the event. Under no
+ * circumstances should personally-identifiable information be included in the
+ * @auxiliary_payload or @event_id. Large auxiliary payloads dominate the size
+ * of the event and should therefore be used sparingly. Events for which precise
+ * timing information is not required should instead be recorded using
  * emtr_event_recorder_record_events() to conserve bandwidth.
  *
  * At the discretion of the metrics system, the event may be discarded before
@@ -548,13 +547,13 @@ emtr_event_recorder_record_event (EmtrEventRecorder *self,
  *
  * Make a best-effort to record the fact that @num_events events of type
  * @event_id happened between the current time and the previous such recording.
- * emtr-event-types.h is the registry for event IDs. Optionally, associate
- * arbitrary data, @auxiliary_payload, with these particular instances of the
- * event. Under no circumstances should personally-identifiable information be
- * included in the @auxiliary_payload, the @event_id, or @num_events. Large
- * auxiliary payloads dominate the size of the event and should therefore be
- * used sparingly. Events for which precise timing information is required
- * should instead be recorded using emtr_event_recorder_record_event().
+ * Optionally, associate arbitrary data, @auxiliary_payload, with these
+ * particular instances of the event. Under no circumstances should
+ * personally-identifiable information be included in the @auxiliary_payload,
+ * the @event_id, or @num_events. Large auxiliary payloads dominate the size of
+ * the event and should therefore be used sparingly. Events for which precise
+ * timing information is required should instead be recorded using
+ * emtr_event_recorder_record_event().
  *
  * At the discretion of the metrics system, the events may be discarded before
  * being reported to the metrics server. The events may take arbitrarily long to
@@ -638,9 +637,8 @@ emtr_event_recorder_record_events (EmtrEventRecorder *self,
  *
  * Make a best-effort to record the fact that an event of type @event_id
  * started at the current time. The event's stop must be reported using
- * emtr_event_recorder_record_stop() or memory will be leaked.
- * emtr-event-types.h is the registry for event IDs. If starts and stops of
- * events of type @event_id can be nested, then @key should be used to
+ * emtr_event_recorder_record_stop() or memory will be leaked. If starts and
+ * stops of events of type @event_id can be nested, then @key should be used to
  * disambiguate the stop and any progress that corresponds to this start. For
  * example, if one were recording how long processes remained open, process IDs
  * would be a suitable choice for the @key. Within the lifetime of each process,
@@ -742,8 +740,6 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
           gchar *key_as_string = g_variant_print (key, TRUE);
           g_variant_unref (key);
 
-          // TODO: Make error message more helpful by printing the name of the
-          // event as opposed to its UUID.
           g_warning ("Ignoring request to start event of type %s with key %s "
                      "because there is already an unstopped start event with this "
                      "type and key.", event_id, key_as_string);
@@ -752,8 +748,6 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
         }
       else
         {
-          // TODO: Make error message more helpful by printing the name of the
-          // event as opposed to its UUID.
           g_warning ("Ignoring request to start event of type %s with NULL key "
                      "because there is already an unstopped start event with "
                      "this type and key.", event_id);
@@ -854,8 +848,6 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
           gchar *key_as_string = g_variant_print (key, TRUE);
           g_variant_unref (key);
 
-          // TODO: Make error message more helpful by printing the name of the
-          // event as opposed to its UUID.
           g_warning ("Ignoring request to record progress for event of type %s "
                      "with key %s because there is no corresponding unstopped "
                      "start event.", event_id, key_as_string);
@@ -864,8 +856,6 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
         }
       else
         {
-          // TODO: Make error message more helpful by printing the name of the
-          // event as opposed to its UUID.
           g_warning ("Ignoring request to record progress for event of type %s "
                      "with NULL key because there is no corresponding "
                      "unstopped start event.", event_id);
