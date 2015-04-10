@@ -34,9 +34,9 @@ m4_define([_EMTR_API_VERSION_MACRO], [0])
 # Minor and micro versions: increment micro version when making a release. Minor
 # version is even for a stable release and odd for a development release.
 # When making any release, if the API changes, set the interface age to 0.
-m4_define([_EMTR_MINOR_VERSION_MACRO], [2])
-m4_define([_EMTR_MICRO_VERSION_MACRO], [1])
-m4_define([_EMTR_INTERFACE_AGE_MACRO], [1])
+m4_define([_EMTR_MINOR_VERSION_MACRO], [3])
+m4_define([_EMTR_MICRO_VERSION_MACRO], [0])
+m4_define([_EMTR_INTERFACE_AGE_MACRO], [0])
 
 # Full version, for use in AC_INIT
 m4_define([_EMTR_VERSION_MACRO],
@@ -50,10 +50,12 @@ AC_INIT([EOS Metrics Kit], [_EMTR_VERSION_MACRO],
     [], [eos-metrics], [http://endlessm.com])
 # Verify that the source directory can be found
 AC_CONFIG_SRCDIR([eosmetrics/eosmetrics.h])
-# Initialize Automake: enable all warnings and do not insist on GNU standards
-# no-portability suppresses warnings about syntax specific to GNU make
+# Initialize Automake: enable all warnings and do not insist on GNU standards.
+# no-portability suppresses warnings about syntax specific to GNU make.
 # parallel-tests specifies that we use the new parallel-running test harness.
-# Unlike serial-tests, this option is accepted by Automake 1.11
+# Unlike serial-tests, this option is accepted by Automake 1.11.
+# subdir-objects ensures forward compatibility with Automake 2.0 and can be
+# removed when this behavior becomes the default.
 # tar-ustar is required because there may be files whose entire paths exceed
 # 99 characters.
 AM_INIT_AUTOMAKE([-Wall -Wno-portability foreign 1.11 parallel-tests
