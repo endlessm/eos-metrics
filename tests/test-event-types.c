@@ -18,6 +18,8 @@
  */
 
 #include <glib.h>
+
+#define EMTR_DISABLE_DEPRECATION_WARNINGS
 #include "eosmetrics/eosmetrics.h"
 
 #define REAL_EVENT EMTR_EVENT_USER_IS_LOGGED_IN

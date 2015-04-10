@@ -72,14 +72,15 @@ AC_CACHE_SAVE
 # Version numbers and macros
 EMTR_API_VERSION=_EMTR_API_VERSION_MACRO
 AC_SUBST(EMTR_API_VERSION)
-AC_DEFINE([EMTR_MAJOR_VERSION], [_EMTR_API_VERSION_MACRO], [Major (API) version])
 EMTR_API_NAME="eosmetrics-$EMTR_API_VERSION"
 AC_SUBST(EMTR_API_NAME)
+EMTR_MAJOR_VERSION=_EMTR_API_VERSION_MACRO
 EMTR_MINOR_VERSION=_EMTR_MINOR_VERSION_MACRO
 EMTR_MICRO_VERSION=_EMTR_MICRO_VERSION_MACRO
 EMTR_INTERFACE_AGE=_EMTR_INTERFACE_AGE_MACRO
-AC_DEFINE([EMTR_MINOR_VERSION], [_EMTR_MINOR_VERSION_MACRO], [Minor version])
-AC_DEFINE([EMTR_MICRO_VERSION], [_EMTR_MICRO_VERSION_MACRO], [Micro version])
+AC_SUBST(EMTR_MAJOR_VERSION)
+AC_SUBST(EMTR_MINOR_VERSION)
+AC_SUBST(EMTR_MICRO_VERSION)
 AC_DEFINE([EMTR_VERSION], [_EMTR_VERSION_MACRO], [Full version number])
 
 # Shared library versioning; calculated automatically.
@@ -218,6 +219,7 @@ AC_CONFIG_FILES([
     Makefile
     docs/reference/eosmetrics/Makefile
     docs/reference/eosmetrics/version.xml
+    eosmetrics/emtr-version.h
     $EMTR_API_NAME.pc
 ])
 AC_CONFIG_HEADERS([config.h])  dnl Header with system-dependent #defines
