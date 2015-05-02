@@ -205,7 +205,7 @@ PKG_CHECK_MODULES([EOSMETRICS], [
     $EMTR_REQUIRED_MODULES_PRIVATE])
 
 # This indicates a required dbus mocking interface for unit testing.
-AX_PYTHON_MODULE([dbusmock], [required])
+AX_PYTHON_MODULE_VERSION([dbusmock], 0.10)
 
 # Code coverage
 # -------------
