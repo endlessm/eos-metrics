@@ -31,13 +31,13 @@ export DBUS_SESSION_BUS_PID
 trap finally EXIT
 
 # Start the mock service and add its methods.
-python -m dbusmock --system \
+python3 -m dbusmock --system \
     com.endlessm.Metrics \
     /com/endlessm/Metrics \
     com.endlessm.Metrics.EventRecorderServer &
 
 # Wait for the service to come up
-python `dirname $0`/wait-for-service-helper.py
+python3 `dirname $0`/wait-for-service-helper.py
 
 gdbus call --system \
     -d com.endlessm.Metrics \

@@ -68,7 +68,7 @@ DBUSEVENTRECORDER_LOG_COMPILER = $(top_srcdir)/tests/launch-mock-event-recorder-
 AM_DBUSEVENTRECORDER_LOG_FLAGS = -k --verbose
 LOG_COMPILER = gtester
 AM_LOG_FLAGS = -k --verbose
-PY_LOG_COMPILER = python
+PY_LOG_COMPILER = python3
 
 # Use locally built versions of EosMetrics-0.gir and libraries; this may need to
 # be changed to AM_TESTS_ENVIRONMENT in a future version of Automake.
