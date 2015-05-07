@@ -33,7 +33,6 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
     _MOCK_EVENT_NOTHING_HAPPENED = '5071dd96-bdad-4ee5-9c26-3dfef34a9963'
     _MOCK_EVENT_NOTHING_HAPPENED_BYTES = \
         uuid.UUID(_MOCK_EVENT_NOTHING_HAPPENED).bytes
-    _NANOSECONDS_PER_SECOND = 1000000000L
     _METRICS_BUS_NAME = 'com.endlessm.Metrics'
     _METRICS_OBJECT_PATH = '/com/endlessm/Metrics'
     _METRICS_IFACE = 'com.endlessm.Metrics.EventRecorderServer'
@@ -347,7 +346,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -365,7 +364,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -383,7 +382,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -401,7 +400,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -419,7 +418,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -437,7 +436,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
