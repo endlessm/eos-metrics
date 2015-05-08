@@ -275,6 +275,38 @@ test_event_recorder_record_progress_sync_with_floating_key (struct RecorderFixtu
 }
 
 static void
+test_event_recorder_record_progress_with_same_instance_for_key_and_auxiliary_payload (struct RecorderFixture *fixture,
+                                                                                      gconstpointer           unused)
+{
+  GVariant *variant =
+    g_variant_new_string ("Navas clearly deserved the Golden Glove.");
+  g_variant_ref_sink (variant);
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT,
+                                    variant, variant);
+  emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT,
+                                       variant, variant);
+  emtr_event_recorder_record_stop (fixture->recorder, MEANINGLESS_EVENT,
+                                   variant, variant);
+  g_variant_unref (variant);
+}
+
+static void
+test_event_recorder_record_progress_sync_with_same_instance_for_key_and_auxiliary_payload (struct RecorderFixture *fixture,
+                                                                                           gconstpointer           unused)
+{
+  GVariant *variant =
+    g_variant_new_string ("Poor Messi.");
+  g_variant_ref_sink (variant);
+  emtr_event_recorder_record_start (fixture->recorder, MEANINGLESS_EVENT,
+                                    variant, variant);
+  emtr_event_recorder_record_progress (fixture->recorder, MEANINGLESS_EVENT,
+                                       variant, variant);
+  emtr_event_recorder_record_stop_sync (fixture->recorder, MEANINGLESS_EVENT,
+                                        variant, variant);
+  g_variant_unref (variant);
+}
+
+static void
 test_event_recorder_record_auxiliary_payload (struct RecorderFixture *fixture,
                                               gconstpointer           unused)
 {
@@ -432,6 +464,10 @@ main (int    argc,
                           test_event_recorder_record_progress_with_floating_key);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-progress-sync-with-floating-key",
                           test_event_recorder_record_progress_sync_with_floating_key);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-progress-with-same-instance-for-key-and-auxiliary-payload",
+                          test_event_recorder_record_progress_with_same_instance_for_key_and_auxiliary_payload);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/record-progress-sync-with-same-instance-for-key-and-auxiliary-payload",
+                          test_event_recorder_record_progress_sync_with_same_instance_for_key_and_auxiliary_payload);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-auxiliary-payload",
                           test_event_recorder_record_auxiliary_payload);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-multiple-metric-sequences",
