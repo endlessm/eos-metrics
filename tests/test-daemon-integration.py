@@ -31,9 +31,7 @@ from gi.repository import GLib
 
 class TestDaemonIntegration(dbusmock.DBusTestCase):
     _MOCK_EVENT_NOTHING_HAPPENED = '5071dd96-bdad-4ee5-9c26-3dfef34a9963'
-    _MOCK_EVENT_NOTHING_HAPPENED_BYTES = \
-        uuid.UUID(_MOCK_EVENT_NOTHING_HAPPENED).bytes
-    _NANOSECONDS_PER_SECOND = 1000000000L
+    _MOCK_EVENT_NOTHING_HAPPENED_UUID = uuid.UUID(_MOCK_EVENT_NOTHING_HAPPENED)
     _METRICS_BUS_NAME = 'com.endlessm.Metrics'
     _METRICS_OBJECT_PATH = '/com/endlessm/Metrics'
     _METRICS_IFACE = 'com.endlessm.Metrics.EventRecorderServer'
@@ -229,40 +227,40 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_start_stop_event_sync()
         self.assertEqual(calls[0][2][0], os.getuid())
 
-    def dbus_bytes_to_python_bytes(self, dbus_byte_array):
-        bytes_as_chars = map(chr, dbus_byte_array)
-        return ''.join(bytes_as_chars)
+    def dbus_bytes_to_uuid(self, dbus_byte_array):
+        bytes_as_bytes = bytes(dbus_byte_array)
+        return uuid.UUID(bytes=bytes_as_bytes)
 
     # Event Id is't garbled.
     def test_record_singular_event_passes_event_id(self):
         calls = self.call_singular_event()
-        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
-        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
+        actual_uuid = self.dbus_bytes_to_uuid(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_UUID, actual_uuid)
 
     def test_record_singular_event_sync_passes_event_id(self):
         calls = self.call_singular_event_sync()
-        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
-        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
+        actual_uuid = self.dbus_bytes_to_uuid(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_UUID, actual_uuid)
 
     def test_record_aggregate_event_passes_event_id(self):
         calls = self.call_aggregate_event()
-        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
-        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
+        actual_uuid = self.dbus_bytes_to_uuid(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_UUID, actual_uuid)
 
     def test_record_aggregate_event_sync_passes_event_id(self):
         calls = self.call_aggregate_event_sync()
-        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
-        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
+        actual_uuid = self.dbus_bytes_to_uuid(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_UUID, actual_uuid)
 
     def test_record_event_sequence_passes_event_id(self):
         calls = self.call_start_stop_event()
-        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
-        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
+        actual_uuid = self.dbus_bytes_to_uuid(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_UUID, actual_uuid)
 
     def test_record_event_sequence_sync_passes_event_id(self):
         calls = self.call_start_stop_event_sync()
-        actual_bytes = self.dbus_bytes_to_python_bytes(calls[0][2][1])
-        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_BYTES, actual_bytes)
+        actual_uuid = self.dbus_bytes_to_uuid(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_UUID, actual_uuid)
 
     # Aggregated events' count isn't garbled.
     def test_record_aggregate_event_passes_event_count(self):
@@ -347,7 +345,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -365,7 +363,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -383,7 +381,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -401,7 +399,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -419,7 +417,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)
@@ -437,7 +435,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = self._NANOSECONDS_PER_SECOND * \
+        absolute_time_difference = 1e9 * \
             (absolute_time_second - absolute_time_first)
         self.assertLessEqual(relative_time_difference,
                              absolute_time_difference)

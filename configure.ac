@@ -105,8 +105,6 @@ EMTR_REQUIRED_MODULES="$GOBJECT_REQUIREMENT"
 EMTR_REQUIRED_MODULES_PRIVATE="$GIO_REQUIREMENT $UUID_REQUIREMENT"
 AC_SUBST(EMTR_REQUIRED_MODULES)
 AC_SUBST(EMTR_REQUIRED_MODULES_PRIVATE)
-# This indicates a required dbus mocking interface for unit testing.
-AX_PYTHON_MODULE([dbusmock], [required])
 
 # Required build tools
 # --------------------
@@ -205,6 +203,9 @@ AC_MSG_RESULT([$can_make_dist])
 PKG_CHECK_MODULES([EOSMETRICS], [
     $EMTR_REQUIRED_MODULES
     $EMTR_REQUIRED_MODULES_PRIVATE])
+
+# This indicates a required dbus mocking interface for unit testing.
+AX_PYTHON_MODULE_VERSION([dbusmock], 0.10)
 
 # Code coverage
 # -------------
