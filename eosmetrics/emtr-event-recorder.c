@@ -118,7 +118,7 @@ emtr_event_recorder_finalize (GObject *object)
     emtr_event_recorder_get_instance_private (self);
 
   g_hash_table_destroy (priv->events_by_id_with_key);
-  g_mutex_clear (&(priv->events_by_id_with_key_lock));
+  g_mutex_clear (&priv->events_by_id_with_key_lock);
 
   g_variant_unref (priv->empty_auxiliary_payload);
   g_clear_object (&priv->dbus_proxy);
@@ -167,7 +167,7 @@ emtr_event_recorder_init (EmtrEventRecorder *self)
     g_hash_table_new_full (general_variant_hash, g_variant_equal,
                            (GDestroyNotify) g_variant_unref,
                            (GDestroyNotify) g_array_unref);
-  g_mutex_init (&(priv->events_by_id_with_key_lock));
+  g_mutex_init (&priv->events_by_id_with_key_lock);
 
   GVariant *unboxed_variant = g_variant_new_boolean (FALSE);
   priv->empty_auxiliary_payload = g_variant_new_variant (unboxed_variant);
@@ -510,7 +510,7 @@ record_stop (EmtrEventRecorder *self,
 
   /* Acquire this lock before getting the time so that event sequences are
      guaranteed to be chronologically sorted. */
-  g_mutex_lock (&(priv->events_by_id_with_key_lock));
+  g_mutex_lock (&priv->events_by_id_with_key_lock);
 
   // Get the time as soon as possible because it will change during execution.
   gint64 relative_time;
@@ -575,7 +575,7 @@ record_stop (EmtrEventRecorder *self,
   g_variant_unref (event_id_with_key);
 
 finally:
-  g_mutex_unlock (&(priv->events_by_id_with_key_lock));
+  g_mutex_unlock (&priv->events_by_id_with_key_lock);
 }
 
 /* PUBLIC API */
@@ -967,7 +967,7 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
 
   /* Acquire this lock before getting the time so that event sequences are
      guaranteed to be chronologically sorted. */
-  g_mutex_lock (&(priv->events_by_id_with_key_lock));
+  g_mutex_lock (&priv->events_by_id_with_key_lock);
 
   // Get the time as soon as possible because it will change during execution.
   gint64 relative_time;
@@ -1021,7 +1021,7 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
     g_variant_unref (key);
 
 finally:
-  g_mutex_unlock (&(priv->events_by_id_with_key_lock));
+  g_mutex_unlock (&priv->events_by_id_with_key_lock);
 }
 
 /**
@@ -1081,7 +1081,7 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
 
   /* Acquire this lock before getting the time so that event sequences are
      guaranteed to be chronologically sorted. */
-  g_mutex_lock (&(priv->events_by_id_with_key_lock));
+  g_mutex_lock (&priv->events_by_id_with_key_lock);
 
   // Get the time as soon as possible because it will change during execution.
   gint64 relative_time;
@@ -1137,7 +1137,7 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
     g_variant_unref (auxiliary_payload);
 
 finally:
-  g_mutex_unlock (&(priv->events_by_id_with_key_lock));
+  g_mutex_unlock (&priv->events_by_id_with_key_lock);
 }
 
 /**
