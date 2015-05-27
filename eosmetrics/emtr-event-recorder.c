@@ -213,15 +213,12 @@ parse_event_id (const gchar *unparsed_event_id,
 static GVariant *
 get_normalized_form_of_variant (GVariant *variant)
 {
-  GVariant *normalized_variant = NULL;
+  if (variant == NULL)
+    return NULL;
 
-  if (variant != NULL)
-    {
-      g_variant_ref_sink (variant);
-      normalized_variant = g_variant_get_normal_form (variant);
-      g_variant_unref (variant);
-    }
-
+  g_variant_ref_sink (variant);
+  GVariant *normalized_variant = g_variant_get_normal_form (variant);
+  g_variant_unref (variant);
   return normalized_variant;
 }
 
