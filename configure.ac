@@ -207,6 +207,9 @@ PKG_CHECK_MODULES([EOSMETRICS], [
 # This indicates a required dbus mocking interface for unit testing.
 AX_PYTHON_MODULE_VERSION([dbusmock], 0.10)
 
+# The Python dbus module is required for unit testing.
+AX_PYTHON_MODULE([dbus])
+
 # Code coverage
 # -------------
 EOS_COVERAGE_REPORT([c])

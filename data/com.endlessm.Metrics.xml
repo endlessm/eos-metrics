@@ -130,5 +130,14 @@ License along with eos-metrics.  If not, see
       <arg type="a(xbv)" name="events"/>
     </method>
 
+    <!--
+      UploadEvents:
+
+      Uploads all events that haven't already been uploaded to the metrics
+      servers. The event recorder daemon may have already decided to upload some
+      or all events before this method was called. Once events have been
+      uploaded, they may no longer be stored locally.
+    -->
+    <method name="UploadEvents"/>
   </interface>
 </node>
