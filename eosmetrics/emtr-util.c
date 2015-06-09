@@ -28,7 +28,6 @@
 
 #include <errno.h>
 #include <time.h>
-#include <inttypes.h>
 
 #include <glib.h>
 
@@ -89,7 +88,7 @@ emtr_util_get_current_time (clockid_t clock_id,
       /* The (gint64) conversion is to handle the fact that time_t's size is
       platform-defined; so we cast it to 64 bits. tv_nsec is defined as long. */
       g_critical ("Clock returned a time that does not fit in a 64-bit integer "
-                  "in nanoseconds (seconds %" PRId64 ", nanoseconds "
+                  "in nanoseconds (seconds %" G_GINT64_FORMAT ", nanoseconds "
                   "%ld.)", (gint64) ts.tv_sec, ts.tv_nsec);
       return FALSE;
     }
