@@ -94,8 +94,8 @@ emtr_util_get_current_time (clockid_t clock_id,
       return FALSE;
     }
 
-  gint64 detected_time = (NANOSECONDS_PER_SECOND * ((gint64) ts.tv_sec))
-                          + ((gint64) ts.tv_nsec);
+  gint64 detected_time =
+    (NANOSECONDS_PER_SECOND * ((gint64) ts.tv_sec)) + ((gint64) ts.tv_nsec);
   if (detected_time < (G_MININT64 / 2) || detected_time > (G_MAXINT64 / 2))
     {
       g_critical ("Clock returned a time that may result in arithmetic that "
