@@ -244,21 +244,6 @@ combine_event_id_with_key (uuid_t    event_id,
   return g_variant_new ("(aymv)", &event_id_builder, key);
 }
 
-/* Variants sent to D-Bus are not allowed to be NULL or maybe types. */
-static GVariant *
-get_time_with_maybe_variant (EmtrEventRecorder *self,
-                             gint64             relative_time,
-                             GVariant          *payload)
-{
-  EmtrEventRecorderPrivate *priv =
-    emtr_event_recorder_get_instance_private (self);
-
-  gboolean has_payload = (payload != NULL);
-  GVariant *maybe_payload = has_payload ?
-    payload : priv->empty_auxiliary_payload;
-  return g_variant_new ("(xbv)", relative_time, has_payload, maybe_payload);
-}
-
 static gboolean
 contains_maybe_variant (GVariant *variant)
 {
@@ -283,8 +268,16 @@ append_event_to_sequence (EmtrEventRecorder *self,
                           gint64             relative_time,
                           GVariant          *auxiliary_payload)
 {
+  EmtrEventRecorderPrivate *priv =
+    emtr_event_recorder_get_instance_private (self);
+
+  /* Variants sent to D-Bus are not allowed to be NULL or maybe types. */
+  gboolean has_payload = (auxiliary_payload != NULL);
+  GVariant *maybe_payload =
+    has_payload ? auxiliary_payload : priv->empty_auxiliary_payload;
   GVariant *event =
-    get_time_with_maybe_variant (self, relative_time, auxiliary_payload);
+    g_variant_new ("(xbv)", relative_time, has_payload, maybe_payload);
+
   g_array_append_val (event_sequence, event);
 }
 
