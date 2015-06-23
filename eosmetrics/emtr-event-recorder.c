@@ -252,7 +252,7 @@ contains_maybe_variant (GVariant *variant)
 
   // type_string belongs to the GVariant and should not be freed.
   const gchar *type_string = g_variant_get_type_string (variant);
-  gchar *found_character = strstr (type_string, "m");
+  gchar *found_character = strchr (type_string, 'm');
   if (found_character != NULL)
     {
       g_critical ("Maybe type found in auxiliary payload. These are not "
