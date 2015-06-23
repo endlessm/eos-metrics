@@ -992,17 +992,17 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
           gchar *key_as_string = g_variant_print (key, TRUE);
           g_variant_unref (key);
 
-          g_warning ("Ignoring request to start event of type %s with key %s "
-                     "because there is already an unstopped start event with this "
+          g_warning ("Restarted event of type %s with key %s; there was "
+                     "already an unstopped start event with this "
                      "type and key.", event_id, key_as_string);
 
           g_free (key_as_string);
         }
       else
         {
-          g_warning ("Ignoring request to start event of type %s with NULL key "
-                     "because there is already an unstopped start event with "
-                     "this type and key.", event_id);
+          g_warning ("Restarted event of type %s with NULL key; there was "
+                     "already an unstopped start event with this type and key.",
+                     event_id);
         }
       goto finally;
     }
