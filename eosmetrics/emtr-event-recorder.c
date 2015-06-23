@@ -166,7 +166,7 @@ emtr_event_recorder_init (EmtrEventRecorder *self)
   priv->events_by_id_with_key =
     g_hash_table_new_full (general_variant_hash, g_variant_equal,
                            (GDestroyNotify) g_variant_unref,
-                           (GDestroyNotify) g_array_unref);
+                           (GDestroyNotify) g_ptr_array_unref);
   g_mutex_init (&priv->events_by_id_with_key_lock);
 
   GVariant *unboxed_variant = g_variant_new_boolean (FALSE);
@@ -264,7 +264,7 @@ contains_maybe_variant (GVariant *variant)
 
 static void
 append_event_to_sequence (EmtrEventRecorder *self,
-                          GArray            *event_sequence,
+                          GPtrArray         *event_sequence,
                           gint64             relative_time,
                           GVariant          *auxiliary_payload)
 {
@@ -278,7 +278,8 @@ append_event_to_sequence (EmtrEventRecorder *self,
   GVariant *event =
     g_variant_new ("(xbv)", relative_time, has_payload, maybe_payload);
 
-  g_array_append_val (event_sequence, event);
+  g_variant_ref_sink (event);
+  g_ptr_array_add (event_sequence, event);
 }
 
 /*
@@ -391,7 +392,7 @@ send_events_to_dbus (EmtrEventRecorder *self,
 static void
 send_event_sequence_to_dbus (EmtrEventRecorder *self,
                              GVariant          *event_id,
-                             GArray            *event_sequence,
+                             GPtrArray         *event_sequence,
                              gboolean           is_synchronous)
 {
   EmtrEventRecorderPrivate *priv =
@@ -401,7 +402,7 @@ send_event_sequence_to_dbus (EmtrEventRecorder *self,
   g_variant_builder_init (&event_sequence_builder, G_VARIANT_TYPE ("a(xbv)"));
   for (gint i = 0; i < event_sequence->len; i++)
     {
-      GVariant *event = g_array_index (event_sequence, GVariant *, i);
+      GVariant *event = g_ptr_array_index (event_sequence, i);
       g_variant_builder_add_value (&event_sequence_builder, event);
     }
   GVariant *event_sequence_variant =
@@ -517,7 +518,7 @@ record_stop (EmtrEventRecorder *self,
 
   GVariant *event_id_with_key = combine_event_id_with_key (parsed_event_id,
                                                            key);
-  GArray *event_sequence =
+  GPtrArray *event_sequence =
     g_hash_table_lookup (priv->events_by_id_with_key, event_id_with_key);
 
   if (event_sequence == NULL)
@@ -976,8 +977,8 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
                                                            key);
 
   auxiliary_payload = get_normalized_form_of_variant (auxiliary_payload);
-  GArray *event_sequence = g_array_sized_new (FALSE, FALSE,
-                                              sizeof (GVariant *), 2);
+  GPtrArray *event_sequence =
+    g_ptr_array_new_full (2u, (GDestroyNotify) g_variant_unref);
   append_event_to_sequence (self, event_sequence, relative_time,
                             auxiliary_payload);
   if (auxiliary_payload != NULL)
@@ -1088,7 +1089,7 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
 
   GVariant *event_id_with_key = combine_event_id_with_key (parsed_event_id,
                                                            key);
-  GArray *event_sequence =
+  GPtrArray *event_sequence =
     g_hash_table_lookup (priv->events_by_id_with_key, event_id_with_key);
   g_variant_unref (event_id_with_key);
 
