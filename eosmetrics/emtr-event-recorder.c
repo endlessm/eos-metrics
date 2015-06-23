@@ -283,10 +283,9 @@ append_event_to_sequence (EmtrEventRecorder *self,
                           gint64             relative_time,
                           GVariant          *auxiliary_payload)
 {
-  GVariant *curr_event_variant = get_time_with_maybe_variant (self,
-                                                              relative_time,
-                                                              auxiliary_payload);
-  g_array_append_val (event_sequence, curr_event_variant);
+  GVariant *event =
+    get_time_with_maybe_variant (self, relative_time, auxiliary_payload);
+  g_array_append_val (event_sequence, event);
 }
 
 /*
@@ -409,8 +408,8 @@ send_event_sequence_to_dbus (EmtrEventRecorder *self,
   g_variant_builder_init (&event_sequence_builder, G_VARIANT_TYPE ("a(xbv)"));
   for (gint i = 0; i < event_sequence->len; i++)
     {
-      GVariant *current = g_array_index (event_sequence, GVariant *, i);
-      g_variant_builder_add_value (&event_sequence_builder, current);
+      GVariant *event = g_array_index (event_sequence, GVariant *, i);
+      g_variant_builder_add_value (&event_sequence_builder, event);
     }
   GVariant *event_sequence_variant =
     g_variant_builder_end (&event_sequence_builder);
