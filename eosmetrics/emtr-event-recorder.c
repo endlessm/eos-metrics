@@ -1087,8 +1087,8 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
 
   key = get_normalized_form_of_variant (key);
 
-  GVariant *event_id_with_key = combine_event_id_with_key (parsed_event_id,
-                                                           key);
+  GVariant *event_id_with_key =
+    combine_event_id_with_key (parsed_event_id, key);
   GPtrArray *event_sequence =
     g_hash_table_lookup (priv->events_by_id_with_key, event_id_with_key);
   g_variant_unref (event_id_with_key);
