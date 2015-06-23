@@ -166,7 +166,7 @@ emtr_event_recorder_init (EmtrEventRecorder *self)
   priv->events_by_id_with_key =
     g_hash_table_new_full (general_variant_hash, g_variant_equal,
                            (GDestroyNotify) g_variant_unref,
-                           (GDestroyNotify) g_array_unref);
+                           (GDestroyNotify) g_ptr_array_unref);
   g_mutex_init (&priv->events_by_id_with_key_lock);
 
   GVariant *unboxed_variant = g_variant_new_boolean (FALSE);
@@ -244,21 +244,6 @@ combine_event_id_with_key (uuid_t    event_id,
   return g_variant_new ("(aymv)", &event_id_builder, key);
 }
 
-/* Variants sent to D-Bus are not allowed to be NULL or maybe types. */
-static GVariant *
-get_time_with_maybe_variant (EmtrEventRecorder *self,
-                             gint64             relative_time,
-                             GVariant          *payload)
-{
-  EmtrEventRecorderPrivate *priv =
-    emtr_event_recorder_get_instance_private (self);
-
-  gboolean has_payload = (payload != NULL);
-  GVariant *maybe_payload = has_payload ?
-    payload : priv->empty_auxiliary_payload;
-  return g_variant_new ("(xbv)", relative_time, has_payload, maybe_payload);
-}
-
 static gboolean
 contains_maybe_variant (GVariant *variant)
 {
@@ -267,7 +252,7 @@ contains_maybe_variant (GVariant *variant)
 
   // type_string belongs to the GVariant and should not be freed.
   const gchar *type_string = g_variant_get_type_string (variant);
-  gchar *found_character = strstr (type_string, "m");
+  gchar *found_character = strchr (type_string, 'm');
   if (found_character != NULL)
     {
       g_critical ("Maybe type found in auxiliary payload. These are not "
@@ -279,14 +264,22 @@ contains_maybe_variant (GVariant *variant)
 
 static void
 append_event_to_sequence (EmtrEventRecorder *self,
-                          GArray            *event_sequence,
+                          GPtrArray         *event_sequence,
                           gint64             relative_time,
                           GVariant          *auxiliary_payload)
 {
-  GVariant *curr_event_variant = get_time_with_maybe_variant (self,
-                                                              relative_time,
-                                                              auxiliary_payload);
-  g_array_append_val (event_sequence, curr_event_variant);
+  EmtrEventRecorderPrivate *priv =
+    emtr_event_recorder_get_instance_private (self);
+
+  /* Variants sent to D-Bus are not allowed to be NULL or maybe types. */
+  gboolean has_payload = (auxiliary_payload != NULL);
+  GVariant *maybe_payload =
+    has_payload ? auxiliary_payload : priv->empty_auxiliary_payload;
+  GVariant *event =
+    g_variant_new ("(xbv)", relative_time, has_payload, maybe_payload);
+
+  g_variant_ref_sink (event);
+  g_ptr_array_add (event_sequence, event);
 }
 
 /*
@@ -399,7 +392,7 @@ send_events_to_dbus (EmtrEventRecorder *self,
 static void
 send_event_sequence_to_dbus (EmtrEventRecorder *self,
                              GVariant          *event_id,
-                             GArray            *event_sequence,
+                             GPtrArray         *event_sequence,
                              gboolean           is_synchronous)
 {
   EmtrEventRecorderPrivate *priv =
@@ -409,8 +402,8 @@ send_event_sequence_to_dbus (EmtrEventRecorder *self,
   g_variant_builder_init (&event_sequence_builder, G_VARIANT_TYPE ("a(xbv)"));
   for (gint i = 0; i < event_sequence->len; i++)
     {
-      GVariant *current = g_array_index (event_sequence, GVariant *, i);
-      g_variant_builder_add_value (&event_sequence_builder, current);
+      GVariant *event = g_ptr_array_index (event_sequence, i);
+      g_variant_builder_add_value (&event_sequence_builder, event);
     }
   GVariant *event_sequence_variant =
     g_variant_builder_end (&event_sequence_builder);
@@ -525,7 +518,7 @@ record_stop (EmtrEventRecorder *self,
 
   GVariant *event_id_with_key = combine_event_id_with_key (parsed_event_id,
                                                            key);
-  GArray *event_sequence =
+  GPtrArray *event_sequence =
     g_hash_table_lookup (priv->events_by_id_with_key, event_id_with_key);
 
   if (event_sequence == NULL)
@@ -984,8 +977,8 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
                                                            key);
 
   auxiliary_payload = get_normalized_form_of_variant (auxiliary_payload);
-  GArray *event_sequence = g_array_sized_new (FALSE, FALSE,
-                                              sizeof (GVariant *), 2);
+  GPtrArray *event_sequence =
+    g_ptr_array_new_full (2u, (GDestroyNotify) g_variant_unref);
   append_event_to_sequence (self, event_sequence, relative_time,
                             auxiliary_payload);
   if (auxiliary_payload != NULL)
@@ -999,17 +992,17 @@ emtr_event_recorder_record_start (EmtrEventRecorder *self,
           gchar *key_as_string = g_variant_print (key, TRUE);
           g_variant_unref (key);
 
-          g_warning ("Ignoring request to start event of type %s with key %s "
-                     "because there is already an unstopped start event with this "
+          g_warning ("Restarted event of type %s with key %s; there was "
+                     "already an unstopped start event with this "
                      "type and key.", event_id, key_as_string);
 
           g_free (key_as_string);
         }
       else
         {
-          g_warning ("Ignoring request to start event of type %s with NULL key "
-                     "because there is already an unstopped start event with "
-                     "this type and key.", event_id);
+          g_warning ("Restarted event of type %s with NULL key; there was "
+                     "already an unstopped start event with this type and key.",
+                     event_id);
         }
       goto finally;
     }
@@ -1094,9 +1087,9 @@ emtr_event_recorder_record_progress (EmtrEventRecorder *self,
 
   key = get_normalized_form_of_variant (key);
 
-  GVariant *event_id_with_key = combine_event_id_with_key (parsed_event_id,
-                                                           key);
-  GArray *event_sequence =
+  GVariant *event_id_with_key =
+    combine_event_id_with_key (parsed_event_id, key);
+  GPtrArray *event_sequence =
     g_hash_table_lookup (priv->events_by_id_with_key, event_id_with_key);
   g_variant_unref (event_id_with_key);
 
