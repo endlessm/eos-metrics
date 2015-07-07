@@ -19,15 +19,12 @@
 import sys
 from gi.repository import GLib, Gio
 
-
 DBUS_NAME = 'com.endlessm.Metrics'
-
 
 def on_name_appeared(connection, name, owner):
     print(DBUS_NAME, 'appeared')
     Gio.bus_unwatch_name(watcher_id)
     loop.quit()
-
 
 def on_timeout():
     print('Timed out')

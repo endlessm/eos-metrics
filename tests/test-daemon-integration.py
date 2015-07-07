@@ -331,9 +331,9 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.assertLessEqual(third_time, fourth_time)
 
     # The difference between two relative timestamps is non-negative and less
-    # than that of two surrounding absolute timestamps.
+    # than that of two surrounding monotonic timestamps.
     def test_record_singular_event_has_reasonable_relative_timestamp(self):
-        absolute_time_first = time.time()
+        monotonic_time_first = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         calls = self.call_singular_event()
         relative_time_first = calls[0][2][2]
@@ -341,17 +341,17 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_singular_event()
         relative_time_second = calls[0][2][2]
 
-        absolute_time_second = time.time()
+        monotonic_time_second = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = 1e9 * \
-            (absolute_time_second - absolute_time_first)
+        monotonic_time_difference = 1e9 * \
+            (monotonic_time_second - monotonic_time_first)
         self.assertLessEqual(relative_time_difference,
-                             absolute_time_difference)
+                             monotonic_time_difference)
 
     def test_record_singular_event_sync_has_reasonable_relative_timestamp(self):
-        absolute_time_first = time.time()
+        monotonic_time_first = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         calls = self.call_singular_event_sync()
         relative_time_first = calls[0][2][2]
@@ -359,17 +359,17 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_singular_event_sync()
         relative_time_second = calls[0][2][2]
 
-        absolute_time_second = time.time()
+        monotonic_time_second = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = 1e9 * \
-            (absolute_time_second - absolute_time_first)
+        monotonic_time_difference = 1e9 * \
+            (monotonic_time_second - monotonic_time_first)
         self.assertLessEqual(relative_time_difference,
-                             absolute_time_difference)
+                             monotonic_time_difference)
 
     def test_record_aggregate_event_has_reasonable_relative_timestamp(self):
-        absolute_time_first = time.time()
+        monotonic_time_first = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         calls = self.call_aggregate_event()
         relative_time_first = calls[0][2][3]
@@ -377,17 +377,17 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_aggregate_event()
         relative_time_second = calls[0][2][3]
 
-        absolute_time_second = time.time()
+        monotonic_time_second = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = 1e9 * \
-            (absolute_time_second - absolute_time_first)
+        monotonic_time_difference = 1e9 * \
+            (monotonic_time_second - monotonic_time_first)
         self.assertLessEqual(relative_time_difference,
-                             absolute_time_difference)
+                             monotonic_time_difference)
 
     def test_record_aggregate_event_sync_has_reasonable_relative_timestamp(self):
-        absolute_time_first = time.time()
+        monotonic_time_first = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         calls = self.call_aggregate_event_sync()
         relative_time_first = calls[0][2][3]
@@ -395,17 +395,17 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_aggregate_event_sync()
         relative_time_second = calls[0][2][3]
 
-        absolute_time_second = time.time()
+        monotonic_time_second = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = 1e9 * \
-            (absolute_time_second - absolute_time_first)
+        monotonic_time_difference = 1e9 * \
+            (monotonic_time_second - monotonic_time_first)
         self.assertLessEqual(relative_time_difference,
-                             absolute_time_difference)
+                             monotonic_time_difference)
 
     def test_record_event_sequence_has_reasonable_relative_timestamp(self):
-        absolute_time_first = time.time()
+        monotonic_time_first = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         calls = self.call_start_stop_event()
         relative_time_first = calls[0][2][2][0][0]
@@ -413,17 +413,17 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_start_stop_event()
         relative_time_second = calls[0][2][2][1][0]
 
-        absolute_time_second = time.time()
+        monotonic_time_second = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = 1e9 * \
-            (absolute_time_second - absolute_time_first)
+        monotonic_time_difference = 1e9 * \
+            (monotonic_time_second - monotonic_time_first)
         self.assertLessEqual(relative_time_difference,
-                             absolute_time_difference)
+                             monotonic_time_difference)
 
     def test_record_event_sequence_sync_has_reasonable_relative_timestamp(self):
-        absolute_time_first = time.time()
+        monotonic_time_first = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         calls = self.call_start_stop_event_sync()
         relative_time_first = calls[0][2][2][0][0]
@@ -431,14 +431,14 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         calls = self.call_start_stop_event_sync()
         relative_time_second = calls[0][2][2][1][0]
 
-        absolute_time_second = time.time()
+        monotonic_time_second = time.clock_gettime(time.CLOCK_MONOTONIC)
 
         relative_time_difference = relative_time_second - relative_time_first
         self.assertLessEqual(0, relative_time_difference)
-        absolute_time_difference = 1e9 * \
-            (absolute_time_second - absolute_time_first)
+        monotonic_time_difference = 1e9 * \
+            (monotonic_time_second - monotonic_time_first)
         self.assertLessEqual(relative_time_difference,
-                             absolute_time_difference)
+                             monotonic_time_difference)
 
     # The maybe type is emulated correctly for empty payloads.
     def test_record_singular_event_maybe_flag_is_false_when_payload_is_empty(self):
