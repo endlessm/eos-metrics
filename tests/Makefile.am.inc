@@ -61,9 +61,10 @@ TESTS = \
 	tests/test-library.dbuseventrecorder \
 	tests/test-daemon-integration.py \
 	tests/test-event-types \
+	run_coverage.coverage \
 	$(NULL)
 
-TEST_EXTENSIONS = .dbuseventrecorder .py
+TEST_EXTENSIONS = .dbuseventrecorder .py .coverage
 DBUSEVENTRECORDER_LOG_COMPILER = $(top_srcdir)/tests/launch-mock-event-recorder-tests.sh
 AM_DBUSEVENTRECORDER_LOG_FLAGS = -k --verbose
 LOG_COMPILER = gtester
@@ -85,3 +86,5 @@ EXTRA_DIST += \
 	tests/smoke-tests/smokeLibrary.js \
 	tests/wait-for-service-helper.py \
 	$(NULL)
+
+clean-local:: clean-coverage
