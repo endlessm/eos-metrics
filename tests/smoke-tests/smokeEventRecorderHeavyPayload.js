@@ -1,3 +1,5 @@
+#!/usr/bin/env gjs
+
 /* Copyright 2014, 2015 Endless Mobile, Inc. */
 
 /* This file is part of eos-metrics.
