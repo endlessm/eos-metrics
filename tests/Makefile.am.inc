@@ -80,7 +80,6 @@ TESTS_ENVIRONMENT = \
 
 EXTRA_DIST += \
 	tests/test-daemon-integration.py \
-	tests/smoke-tests/event-types.js \
 	tests/smoke-tests/smokeEventRecorderHeavyPayload.js \
 	tests/smoke-tests/smokeEventRecorder.js \
 	tests/smoke-tests/smokeLibrary.js \
