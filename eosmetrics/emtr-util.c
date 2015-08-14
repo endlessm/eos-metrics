@@ -99,7 +99,7 @@ emtr_util_get_current_time (clockid_t clock_id,
     {
       g_critical ("Clock returned a time that may result in arithmetic that "
                   "causes 64-bit overflow. This machine may have been running "
-                  "for over 100 years! (Has a bird pooped in your mouth?)");
+                  "for over 100 years!");
       return FALSE;
     }
   *current_time = detected_time;
