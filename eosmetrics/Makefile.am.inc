@@ -16,9 +16,6 @@
 ## License along with eos-metrics.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-EXTRA_DIST += eosmetrics/emtr-version.h.in
-BUILT_SOURCES += eosmetrics/emtr-version.h
-
 eosmetrics_public_installed_headers = eosmetrics/eosmetrics.h
 
 eosmetrics_private_installed_headers = \
