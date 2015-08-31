@@ -33,6 +33,7 @@ eosmetrics_private_installed_headers = \
 	$(NULL)
 
 eosmetrics_library_sources = \
+	eosmetrics/emtr-apiversion-private.h \
 	eosmetrics/emtr-event-recorder.c \
 	eosmetrics/emtr-util.c \
 	emer-event-recorder-server.c \
