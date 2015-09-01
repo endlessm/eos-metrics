@@ -16,9 +16,6 @@
 ## License along with eos-metrics.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-EXTRA_DIST += eosmetrics/emtr-version.h.in
-BUILT_SOURCES += eosmetrics/emtr-version.h
-
 eosmetrics_public_installed_headers = eosmetrics/eosmetrics.h
 
 eosmetrics_private_installed_headers = \
@@ -33,6 +30,7 @@ eosmetrics_private_installed_headers = \
 	$(NULL)
 
 eosmetrics_library_sources = \
+	eosmetrics/emtr-apiversion-private.h \
 	eosmetrics/emtr-event-recorder.c \
 	eosmetrics/emtr-util.c \
 	emer-event-recorder-server.c \
