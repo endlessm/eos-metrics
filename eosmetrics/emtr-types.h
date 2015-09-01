@@ -24,7 +24,7 @@
 #error "Please do not include this header file directly."
 #endif
 
-#include "emtr-apiversion-private.h"
+#include "emtr-apiversion.h"
 #include "emtr-enums.h"
 #include "emtr-macros.h"
 
