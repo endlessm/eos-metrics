@@ -19,6 +19,7 @@
 eosmetrics_public_installed_headers = eosmetrics/eosmetrics.h
 
 eosmetrics_private_installed_headers = \
+	eosmetrics/emtr-apiversion.h \
 	eosmetrics/emtr-enums.h \
 	eosmetrics/emtr-event-recorder.h \
 	eosmetrics/emtr-event-types.h \
@@ -30,7 +31,6 @@ eosmetrics_private_installed_headers = \
 	$(NULL)
 
 eosmetrics_library_sources = \
-	eosmetrics/emtr-apiversion-private.h \
 	eosmetrics/emtr-event-recorder.c \
 	eosmetrics/emtr-util.c \
 	emer-event-recorder-server.c \
