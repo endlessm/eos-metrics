@@ -55,11 +55,11 @@ test_event_id_to_name_handles_invalid_event_ids (void)
   g_test_assert_expected_messages ();
 }
 
-int
-main (int                argc,
-      const char * const argv[])
+gint
+main (gint                argc,
+      const gchar * const argv[])
 {
-  g_test_init (&argc, (char ***) &argv, NULL);
+  g_test_init (&argc, (gchar ***) &argv, NULL);
 
   g_test_add_func ("/event-types/id-to-name-works-with-valid-input",
                    test_event_id_to_name_works_with_valid_input);

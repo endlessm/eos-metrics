@@ -64,10 +64,10 @@ emtr_util_get_current_time (clockid_t clock_id,
   // Get the time before doing anything else because it will change during
   // execution.
   struct timespec ts;
-  int gettime_failed = clock_gettime (clock_id, &ts);
+  gint gettime_failed = clock_gettime (clock_id, &ts);
   if (gettime_failed != 0)
     {
-      int error_code = errno;
+      gint error_code = errno;
       g_critical ("Attempt to get current time failed: %s",
                   g_strerror (error_code));
       return FALSE;

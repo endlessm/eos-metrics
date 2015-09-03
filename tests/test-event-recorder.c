@@ -419,11 +419,11 @@ test_event_recorder_record_auxiliary_payload_with_maybe_throws_critical (struct 
   g_test_assert_expected_messages ();
 }
 
-int
-main (int    argc,
-      char **argv)
+gint
+main (gint                argc,
+      const gchar * const argv[])
 {
-  g_test_init (&argc, &argv, NULL);
+  g_test_init (&argc, (gchar ***) &argv, NULL);
 
 #define ADD_RECORDER_TEST_FUNC(path, func) \
   g_test_add ((path), struct RecorderFixture, NULL, setup, (func), teardown)
