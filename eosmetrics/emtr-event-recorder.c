@@ -198,7 +198,7 @@ static gboolean
 parse_event_id (const gchar *unparsed_event_id,
                 uuid_t       parsed_event_id)
 {
-  int parse_failed = uuid_parse (unparsed_event_id, parsed_event_id);
+  gint parse_failed = uuid_parse (unparsed_event_id, parsed_event_id);
   if (parse_failed != 0)
     {
       g_warning ("Attempt to parse UUID \"%s\" failed. Make sure you created "
@@ -443,7 +443,7 @@ send_event_sequence_to_dbus (EmtrEventRecorder *self,
  * This is only needed for extra-helpful debug messages. Free the return value
  * with g_free().
  */
-static inline char *
+static inline gchar *
 pretty_print_variant_or_null (GVariant *variant)
 {
   if (variant != NULL)
