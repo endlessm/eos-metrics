@@ -25,6 +25,7 @@ LIBRARY_TEST_FLAGS = \
 	@EOSMETRICS_CFLAGS@ \
 	@EOS_C_COVERAGE_CFLAGS@ \
 	-I$(top_srcdir) \
+	-I$(top_builddir)/eosmetrics \
 	-DCOMPILING_EOS_METRICS \
 	-D_POSIX_C_SOURCE=200112L \
 	$(NULL)
@@ -41,6 +42,7 @@ EOSMETRICS_TEST_FLAGS = \
 	@EOSMETRICS_CFLAGS@ \
 	@EOS_C_COVERAGE_CFLAGS@ \
 	-I$(top_srcdir) \
+	-I$(top_builddir)/eosmetrics \
 	$(NULL)
 EOSMETRICS_TEST_LIBS = @EOSMETRICS_LIBS@
 
