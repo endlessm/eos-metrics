@@ -48,6 +48,7 @@ libeosmetrics_@EMTR_API_VERSION@_la_SOURCES = \
 libeosmetrics_@EMTR_API_VERSION@_la_CPPFLAGS = \
 	@EOSMETRICS_CFLAGS@ \
 	@EOS_C_COVERAGE_CFLAGS@ \
+	-I$(top_builddir)/eosmetrics \
 	-DG_LOG_DOMAIN=\"EosMetrics\" \
 	-DCOMPILING_EOS_METRICS \
 	-D_POSIX_C_SOURCE=200112L \

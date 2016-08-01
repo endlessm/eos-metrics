@@ -120,6 +120,7 @@ EosMetrics_@EMTR_API_VERSION@_gir_SCANNERFLAGS = \
 	--identifier-prefix=Emtr \
 	--symbol-prefix=emtr \
 	-DCOMPILING_EOS_METRICS \
+	-I$(top_builddir)/eosmetrics \
 	$(NULL)
 EosMetrics_@EMTR_API_VERSION@_gir_LIBS = libeosmetrics-@EMTR_API_VERSION@.la
 EosMetrics_@EMTR_API_VERSION@_gir_FILES = $(introspection_sources)
