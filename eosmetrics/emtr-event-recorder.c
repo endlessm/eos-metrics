@@ -85,6 +85,13 @@
  *     grinding_time: new GLib.Variant('u', time)
  *   }););
  * ]|
+ *
+ * Event submission may be disabled at runtime by setting the
+ * `EOS_DISABLE_METRICS` environment variable to the empty string or `1`. This
+ * is intended to be set when running unit tests in other modules, for example,
+ * to avoid submitting metrics from unit test runs. It will skip submitting
+ * metrics to the D-Bus daemon, but otherwise all eos-metrics functions will
+ * report success.
  */
 
 typedef struct EmtrEventRecorderPrivate
@@ -304,6 +311,19 @@ send_events_to_dbus_finish_callback (EmerEventRecorderServer *dbus_proxy,
     }
 }
 
+/* Check the EOS_DISABLE_METRICS environment variable to see if we should
+ * skip submitting any metrics. This is intended to be set when running unit
+ * tests in other modules, for example, to avoid submitting metrics from unit
+ * test runs. */
+static gboolean
+disable_event_submission (void)
+{
+  const gchar *val = g_getenv ("EOS_DISABLE_METRICS");
+
+  return (val != NULL &&
+          (g_str_equal (val, "") || g_str_equal (val, "1")));
+}
+
 /* Send either singular or aggregate event to D-Bus.
    num_events parameter is ignored if is_aggregate is FALSE. */
 static void
@@ -319,12 +339,22 @@ send_events_to_dbus (EmtrEventRecorder *self,
     emtr_event_recorder_get_instance_private (self);
 
   GVariantBuilder uuid_builder;
-  get_uuid_builder (parsed_event_id, &uuid_builder);
-  GVariant *event_id_variant = g_variant_builder_end (&uuid_builder);
+  GVariant *event_id_variant;
 
   /* Variants sent to D-Bus are not allowed to be NULL or maybe types. */
   gboolean has_payload = auxiliary_payload != NULL;
-  GVariant *maybe_auxiliary_payload = has_payload ?
+  GVariant *maybe_auxiliary_payload;
+
+  if (disable_event_submission ())
+    {
+      g_debug ("Skipping submitting %i events as submission is disabled",
+               num_events);
+      return;
+    }
+
+  get_uuid_builder (parsed_event_id, &uuid_builder);
+  event_id_variant = g_variant_builder_end (&uuid_builder);
+  maybe_auxiliary_payload = has_payload ?
     g_variant_new_variant (auxiliary_payload) : priv->empty_auxiliary_payload;
 
   if (is_synchronous)
@@ -399,14 +429,22 @@ send_event_sequence_to_dbus (EmtrEventRecorder *self,
     emtr_event_recorder_get_instance_private (self);
 
   GVariantBuilder event_sequence_builder;
+  GVariant *event_sequence_variant;
+
+  if (disable_event_submission ())
+    {
+      g_debug ("Skipping submitting event sequence as submission is disabled");
+      return;
+    }
+
   g_variant_builder_init (&event_sequence_builder, G_VARIANT_TYPE ("a(xbv)"));
   for (gint i = 0; i < event_sequence->len; i++)
     {
       GVariant *event = g_ptr_array_index (event_sequence, i);
       g_variant_builder_add_value (&event_sequence_builder, event);
     }
-  GVariant *event_sequence_variant =
-    g_variant_builder_end (&event_sequence_builder);
+
+  event_sequence_variant = g_variant_builder_end (&event_sequence_builder);
 
   if (is_synchronous)
     {
