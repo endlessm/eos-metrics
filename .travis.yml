@@ -1,0 +1,17 @@
+language: c
+dist: trusty
+
+services: docker
+
+before_install:
+    - docker pull ebassi/endlessci:sdk
+
+before_script:
+    - echo 'FROM ebassi/endlessci:sdk' > Dockerfile
+    - echo 'ADD . /home/jhbuildci/source/eos-metrics' >> Dockerfile
+    - echo 'RUN chown -hR jhbuildci /home/jhbuildci/source/eos-metrics/* /home/jhbuildci/source/eos-metrics/.*' >> Dockerfile
+    - echo 'USER jhbuildci' >> Dockerfile
+    - docker build -t withgit .
+
+script:
+    - docker run -t withgit /bin/sh -c '/usr/bin/endless-build-module --check eos-metrics'
