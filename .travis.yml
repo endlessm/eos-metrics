@@ -1,5 +1,8 @@
 language: c
 dist: trusty
+sudo: false
+cache: ccache
+group: edge
 
 services: docker
 
@@ -8,10 +11,8 @@ before_install:
 
 before_script:
     - echo 'FROM ebassi/endlessci:sdk' > Dockerfile
-    - echo 'ADD . /home/jhbuildci/source/eos-metrics' >> Dockerfile
-    - echo 'RUN chown -hR jhbuildci /home/jhbuildci/source/eos-metrics/* /home/jhbuildci/source/eos-metrics/.*' >> Dockerfile
-    - echo 'USER jhbuildci' >> Dockerfile
+    - echo 'ADD . /root/source/eos-metrics' >> Dockerfile
     - docker build -t withgit .
 
 script:
-    - docker run -t withgit /bin/sh -c '/usr/bin/endless-build-module --check eos-metrics'
+    - docker run --volume $HOME/.ccache:/root/.ccache withgit /bin/sh -c '/usr/bin/endless-build-module --check --with-xvfb eos-metrics'
