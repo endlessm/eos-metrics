@@ -139,5 +139,13 @@ License along with eos-metrics.  If not, see
       uploaded, they may no longer be stored locally.
     -->
     <method name="UploadEvents"/>
+
+    <!--
+      ResetTrackingId:
+
+      Reset the tracking ID for the metrics daemon to a clean state. Resetting
+      the tracking ID can only be done by a privileged process.
+    -->
+    <method name="ResetTrackingId"/>
   </interface>
 </node>
