@@ -41,6 +41,9 @@ License along with eos-metrics.  If not, see
     opted out. -->
     <property name="Enabled" type="b" access="read"/>
 
+    <!-- Environment: The metrics environment, test, dev or production. -->
+    <property name="Environment" type="s" access="read"/>
+
     <!--
       SetEnabled:
       @enabled: whether the metrics server is enabled
