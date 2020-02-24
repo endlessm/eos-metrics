@@ -41,6 +41,10 @@ License along with eos-metrics.  If not, see
     opted out. -->
     <property name="Enabled" type="b" access="read"/>
 
+    <!-- TrackingId: The identifier associated with metrics uploaded by this system.
+    -->
+    <property name="TrackingId" type="s" access="read"/>
+
     <!--
       SetEnabled:
       @enabled: whether the metrics server is enabled
