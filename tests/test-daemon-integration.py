@@ -48,7 +48,13 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
         """Set up a mock system bus."""
-        klass.start_system_bus()
+        # The dbusmock library generates its own D-Bus configuration when
+        # using DBusTestCase.start_system_bus, which breaks in environments
+        # where D-Bus needs special configuration, such as our buildstream
+        # test environment. Instead, we will use start_session_bus and treat
+        # it like a system bus in a similar way to dbusmock.
+        klass.start_session_bus()
+        os.environ['DBUS_SYSTEM_BUS_ADDRESS'] = os.environ['DBUS_SESSION_BUS_ADDRESS']
         klass.dbus_con = klass.get_dbus(system_bus=True)
 
     def setUp(self):
