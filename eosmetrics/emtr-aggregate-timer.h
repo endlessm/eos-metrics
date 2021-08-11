@@ -1,4 +1,6 @@
-/* Copyright 2013, 2014, 2015 Endless Mobile, Inc. */
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
+/* Copyright 2021 Endless OS Foundation, LLC. */
 
 /* This file is part of eos-metrics.
  *
@@ -17,18 +19,21 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef EMTR_TYPES_H
-#define EMTR_TYPES_H
+#pragma once
 
 #if !(defined(_EMTR_INSIDE_EOSMETRICS_H) || defined(COMPILING_EOS_METRICS))
 #error "Please do not include this header file directly."
 #endif
 
-#include "emtr-apiversion.h"
-#include "emtr-enums.h"
-#include "emtr-macros.h"
+#include "emtr-types.h"
+#include <gio/gio.h>
 
-/* Shared typedefs for structures */
-typedef struct _EmtrAggregateTimer EmtrAggregateTimer;
+G_BEGIN_DECLS
 
-#endif /* EMTR_TYPES_H */
+#define EMTR_TYPE_AGGREGATE_TIMER (emtr_aggregate_timer_get_type())
+G_DECLARE_FINAL_TYPE (EmtrAggregateTimer, emtr_aggregate_timer, EMTR, AGGREGATE_TIMER, GObject)
+
+EMTR_AVAILABLE_IN_0_5
+void emtr_aggregate_timer_stop (EmtrAggregateTimer *self);
+
+G_END_DECLS

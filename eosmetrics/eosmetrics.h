@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 #define _EMTR_INSIDE_EOSMETRICS_H
 
 /* Pull in other header files */
+#include "emtr-aggregate-timer.h"
 #include "emtr-event-recorder.h"
 #include "emtr-event-types.h"
 #include "emtr-types.h"

@@ -135,6 +135,11 @@ void               emtr_event_recorder_record_stop_sync   (EmtrEventRecorder *se
                                                            GVariant          *key,
                                                            GVariant          *auxiliary_payload);
 
+EMTR_AVAILABLE_IN_0_5
+EmtrAggregateTimer *emtr_event_recorder_start_aggregate_timer (EmtrEventRecorder *self,
+                                                               const gchar       *event_id,
+                                                               GVariant          *aggregate_key,
+                                                               GVariant          *auxiliary_payload);
 G_END_DECLS
 
 #endif /* EMTR_EVENT_RECORDER_H */
