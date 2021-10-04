@@ -35,6 +35,8 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
     _METRICS_BUS_NAME = 'com.endlessm.Metrics'
     _METRICS_OBJECT_PATH = '/com/endlessm/Metrics'
     _METRICS_IFACE = 'com.endlessm.Metrics.EventRecorderServer'
+    _TIMER_OBJECT_PATH = "/com/endlessm/Metrics/Timer"
+    _TIMER_IFACE = "com.endlessm.Metrics.AggregateTimer"
 
     """
     Makes sure that the app-facing EosMetrics.EventRecorder interface calls
@@ -75,6 +77,11 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
                                           dbus_interface=dbusmock.MOCK_IFACE,
                                           bus_name=self._METRICS_BUS_NAME,
                                           path=self._METRICS_OBJECT_PATH)
+        self.dbus_con.add_signal_receiver(self.handle_dbus_event_received,
+                                          signal_name='MethodCalled',
+                                          dbus_interface=dbusmock.MOCK_IFACE,
+                                          bus_name=self._METRICS_BUS_NAME,
+                                          path=self._TIMER_OBJECT_PATH)
 
         self.interface_mock.AddMethod('', 'RecordSingularEvent', 'uayxbv',
                                       '', '')
@@ -82,6 +89,17 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
                                       '', '')
         self.interface_mock.AddMethod('', 'RecordEventSequence', 'uaya(xbv)',
                                       '', '')
+        self.interface_mock.AddMethod('', 'StartAggregateTimer', 'ayvbv', 'o',
+                                      f"ret = '{self._TIMER_OBJECT_PATH}'")
+
+        self.interface_mock.AddObject(
+            self._TIMER_OBJECT_PATH,
+            self._TIMER_IFACE,
+            {},
+            [
+                ("StopTimer", "", "", ""),
+            ],
+        )
 
         self.event_recorder = EosMetrics.EventRecorder()
         self.interface_mock.ClearCalls()
@@ -94,16 +112,25 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.dbus_mock.terminate()
         self.dbus_mock.wait()
 
-    def quit_on(self, method_name):
+    def await_method_call(self, method_name, timeout_seconds=20):
         """Quit the main loop when the D-Bus method @method_name is called.
-        Timeout after waiting for 20 seconds. Use like this:
-            self.quit_on('MyMethod')
-            self.mainloop.run()
+        Timeout after waiting for 'timeout_seconds'. Use like this:
+            self.await_method_call('MyMethod')
             # now MyMethod has been called
         """
         self._quit_on_method = method_name
-        GLib.timeout_add_seconds(20, self.fail, 'Test timed out after ' +
-                                 'waiting 20 seconds for D-Bus method call.')
+        self._timed_out = False
+        def _timeout():
+            self._timed_out = True
+            self.mainloop.quit()
+            return False
+        timeout_id = GLib.timeout_add_seconds(timeout_seconds, _timeout)
+        self.mainloop.run()
+        if self._timed_out:
+            self.fail(f"Test timed out after waiting {timeout_seconds} seconds for D-Bus method call.")
+        else:
+            GLib.Source.remove(timeout_id)
+            return self.interface_mock.GetCalls()
 
     def handle_dbus_event_received(self, name, *args):
         if name == self._quit_on_method:
@@ -113,9 +140,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
     def call_singular_event(self, payload=None):
         self.event_recorder.record_event(self._MOCK_EVENT_NOTHING_HAPPENED,
                                          payload)
-        self.quit_on('RecordSingularEvent')
-        self.mainloop.run()
-        return self.interface_mock.GetCalls()
+        return self.await_method_call('RecordSingularEvent')
 
     def call_singular_event_sync(self, payload=None):
         self.event_recorder.record_event_sync(self._MOCK_EVENT_NOTHING_HAPPENED,
@@ -125,9 +150,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
     def call_aggregate_event(self, num_events=2, payload=None):
         self.event_recorder.record_events(self._MOCK_EVENT_NOTHING_HAPPENED,
                                           num_events, payload)
-        self.quit_on('RecordAggregateEvent')
-        self.mainloop.run()
-        return self.interface_mock.GetCalls()
+        return self.await_method_call('RecordAggregateEvent')
 
     def call_aggregate_event_sync(self, num_events=2, payload=None):
         self.event_recorder.record_events_sync(self._MOCK_EVENT_NOTHING_HAPPENED,
@@ -139,9 +162,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
                                          None, payload_start)
         self.event_recorder.record_stop(self._MOCK_EVENT_NOTHING_HAPPENED,
                                         None, payload_stop)
-        self.quit_on('RecordEventSequence')
-        self.mainloop.run()
-        return self.interface_mock.GetCalls()
+        return self.await_method_call('RecordEventSequence')
 
     def call_start_stop_event_sync(self, payload_start=None,
                                    payload_stop=None):
@@ -161,9 +182,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
                                             None, payload_progress)
         self.event_recorder.record_stop(self._MOCK_EVENT_NOTHING_HAPPENED,
                                         None, payload_stop)
-        self.quit_on('RecordEventSequence')
-        self.mainloop.run()
-        return self.interface_mock.GetCalls()
+        return self.await_method_call('RecordEventSequence')
 
     def call_start_progress_stop_event_sync(self,
                                             payload_start=None,
@@ -176,6 +195,12 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.event_recorder.record_stop_sync(self._MOCK_EVENT_NOTHING_HAPPENED,
                                              None, payload_stop)
         return self.interface_mock.GetCalls()
+
+    def call_start_timer(self, aggregate_key, payload=None):
+        timer = self.event_recorder.start_aggregate_timer(self._MOCK_EVENT_NOTHING_HAPPENED,
+                                                          aggregate_key,
+                                                          payload)
+        return timer, self.await_method_call("StartAggregateTimer")
 
     # Recorder calls D-Bus at all.
     def test_record_singular_event_calls_dbus(self):
@@ -578,6 +603,30 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.assertEqual(calls[0][2][2][0][2], start_string)
         self.assertEqual(calls[0][2][2][1][2], progress_string)
         self.assertEqual(calls[0][2][2][2][2], stop_string)
+
+    def test_start_timer_passes_payload(self):
+        key_string = "org.gnome.Builder.desktop"
+        key_variant = GLib.Variant.new_string(key_string)
+        payload_string = "com.example.Payload"
+        payload_variant = GLib.Variant.new_string(payload_string)
+        timer, calls = self.call_start_timer(key_variant, payload_variant)
+        self.assertIsInstance(timer, EosMetrics.AggregateTimer)
+        self.assertEqual(calls[0][2][1], key_string)
+        self.assertEqual(calls[0][2][2], True)
+        self.assertEqual(calls[0][2][3], payload_string)
+
+        # Now stop it
+        timer.stop()
+        self.await_method_call("StopTimer")
+
+    def test_timer_calls_stop_when_disposed(self):
+        key_variant = GLib.Variant.new_uint32(42)
+        payload_variant = None
+        timer, calls = self.call_start_timer(key_variant, payload_variant)
+        self.assertIsInstance(timer, EosMetrics.AggregateTimer)
+
+        del timer
+        self.await_method_call("StopTimer")
 
 
 if __name__ == '__main__':
