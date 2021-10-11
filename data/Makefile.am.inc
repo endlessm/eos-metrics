@@ -23,6 +23,7 @@ $(daemon_dbus_sources): data/com.endlessm.Metrics.xml
 	$(AM_V_GEN)$(GDBUS_CODEGEN) --generate-c-code $(daemon_dbus_name) \
 		--c-namespace Emer \
 		--interface-prefix com.endlessm.Metrics. \
+		--c-generate-autocleanup all \
 		$<
 
 dist_pkgdata_DATA = data/com.endlessm.Metrics.xml
