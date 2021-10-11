@@ -1,4 +1,6 @@
-/* Copyright 2013, 2014, 2015 Endless Mobile, Inc. */
+/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+
+/* Copyright 2021 Endless OS Foundation, LLC. */
 
 /* This file is part of eos-metrics.
  *
@@ -17,18 +19,16 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef EMTR_TYPES_H
-#define EMTR_TYPES_H
+#pragma once
 
-#if !(defined(_EMTR_INSIDE_EOSMETRICS_H) || defined(COMPILING_EOS_METRICS))
-#error "Please do not include this header file directly."
-#endif
+#include "emtr-aggregate-timer.h"
+#include "emer-event-recorder-server.h"
 
-#include "emtr-apiversion.h"
-#include "emtr-enums.h"
-#include "emtr-macros.h"
+G_BEGIN_DECLS
 
-/* Shared typedefs for structures */
-typedef struct _EmtrAggregateTimer EmtrAggregateTimer;
+EmtrAggregateTimer *emtr_aggregate_timer_new (EmerEventRecorderServer *dbus_proxy,
+                                              GVariant                *event_id,
+                                              GVariant                *aggregate_key,
+                                              GVariant                *auxiliary_payload);
 
-#endif /* EMTR_TYPES_H */
+G_END_DECLS

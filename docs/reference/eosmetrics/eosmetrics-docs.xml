@@ -17,6 +17,7 @@
 
   <chapter>
     <title>EOS Metrics Reference Manual (C API)</title>
+    <xi:include href="xml/emtr-aggregate-timer.xml"/>
     <xi:include href="xml/emtr-event-recorder.xml"/>
     <xi:include href="xml/emtr-event-types.xml" />
     <xi:include href="xml/emtr-util.xml" />

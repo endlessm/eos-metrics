@@ -419,6 +419,32 @@ test_event_recorder_record_auxiliary_payload_with_maybe_throws_critical (struct 
   g_test_assert_expected_messages ();
 }
 
+static void
+test_event_recorder_aggregate_start_stop_sync (struct RecorderFixture *fixture,
+                                               gconstpointer           unused)
+{
+  g_autoptr(EmtrAggregateTimer) timer = NULL;
+
+  timer = emtr_event_recorder_start_aggregate_timer (fixture->recorder,
+                                                     MEANINGLESS_EVENT,
+                                                     g_variant_new_uint32 (1001),
+                                                     NULL);
+  emtr_aggregate_timer_stop (timer);
+}
+
+static void
+test_event_recorder_aggregate_start_stop_sync_with_payload (struct RecorderFixture *fixture,
+                                                            gconstpointer           unused)
+{
+  g_autoptr(EmtrAggregateTimer) timer = NULL;
+
+  timer = emtr_event_recorder_start_aggregate_timer (fixture->recorder,
+                                                     MEANINGLESS_EVENT,
+                                                     g_variant_new_string ("org.gnome.Builder.desktop"),
+                                                     g_variant_new_string ("org.gnome.Builder.desktop"));
+  // Destroying the timer should call stop here
+}
+
 gint
 main (gint                argc,
       const gchar * const argv[])
@@ -474,6 +500,10 @@ main (gint                argc,
                           test_event_recorder_record_multiple_metric_sequences);
   ADD_RECORDER_TEST_FUNC ("/event-recorder/record-auxiliary-payload-with-maybe-throws-critical",
                           test_event_recorder_record_auxiliary_payload_with_maybe_throws_critical);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/aggregate/start-stop-sync",
+                          test_event_recorder_aggregate_start_stop_sync);
+  ADD_RECORDER_TEST_FUNC ("/event-recorder/aggregate/start-stop-sync-with-payload",
+                          test_event_recorder_aggregate_start_stop_sync_with_payload);
 
 #undef ADD_RECORDER_TEST_FUNC
 

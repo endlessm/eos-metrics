@@ -26,6 +26,7 @@
 
 #include "emtr-event-recorder.h"
 #include "emer-event-recorder-server.h"
+#include "eosmetrics/emtr-aggregate-timer-private.h"
 #include "eosmetrics/emtr-util.h"
 
 #include <string.h>
@@ -1275,6 +1276,56 @@ emtr_event_recorder_record_stop_sync (EmtrEventRecorder *self,
 
   record_stop (self, event_id, key, auxiliary_payload,
                TRUE /* is_synchronous */);
+}
+
+/**
+ * emtr_event_recorder_start_aggregate_timer:
+ * @self: an #EmtrEventRecorder
+ * @event_id: an RFC 4122 UUID representing the type of event that took place
+ * @aggregate_key: the identifier used to aggregate data
+ * @auxiliary_payload: (nullable): miscellaneous data to associate with the
+ * events. Must not contain maybe variants as they are not compatible with
+ * D-Bus.
+ *
+ * Requests the metrics daemon to create an aggregate timer.
+ *
+ * Returns: (transfer full)(nullable): a #EmtrAggregateTimer
+ */
+EmtrAggregateTimer *
+emtr_event_recorder_start_aggregate_timer (EmtrEventRecorder *self,
+                                           const gchar       *event_id,
+                                           GVariant          *aggregate_key,
+                                           GVariant          *auxiliary_payload)
+{
+  EmtrEventRecorderPrivate *priv =
+    emtr_event_recorder_get_instance_private (self);
+  GVariantBuilder event_id_builder;
+  GVariant *maybe_payload;
+  uuid_t parsed_event_id;
+
+  g_return_val_if_fail (EMTR_IS_EVENT_RECORDER (self), NULL);
+  g_return_val_if_fail (_IS_VARIANT (aggregate_key), NULL);
+  g_return_val_if_fail (auxiliary_payload == NULL ||
+                        _IS_VARIANT (auxiliary_payload), NULL);
+
+  if (contains_maybe_variant (auxiliary_payload))
+    return NULL;
+
+  if (!priv->recording_enabled)
+    return NULL;
+
+  if (!parse_event_id (event_id, parsed_event_id))
+    return NULL;
+
+  get_uuid_builder (parsed_event_id, &event_id_builder);
+
+  maybe_payload =
+    auxiliary_payload ? auxiliary_payload : priv->empty_auxiliary_payload;
+
+  return emtr_aggregate_timer_new (priv->dbus_proxy,
+                                   g_variant_builder_end (&event_id_builder),
+                                   g_variant_new_variant (aggregate_key),
+                                   g_variant_new_variant (maybe_payload));
 }
 
 #undef _IS_VARIANT

@@ -49,6 +49,7 @@ EXTRA_HFILES=
 # Header files or dirs to ignore when scanning. Use base file/dir names
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h private_code
 IGNORE_HFILES = \
+	emtr-aggregate-timer-private.h \
 	emtr-apiversion.h \
 	$(NULL)
 
