@@ -35,25 +35,43 @@ struct _EmtrAggregateTimer
 {
   GObject parent_instance;
 
-  EmerAggregateTimer *timer_proxy; /* (owned) */
+  GDBusConnection *connection; /* (unowned) */
   GCancellable *cancellable; /* (owned) */
 
+  gchar *timer_object_path;
   gboolean stopped;
 };
 
 G_DEFINE_TYPE (EmtrAggregateTimer, emtr_aggregate_timer, G_TYPE_OBJECT)
 
 static void
+call_stop_timer (EmtrAggregateTimer *self)
+{
+  if (!self->timer_object_path)
+    return;
+
+  g_dbus_connection_call (self->connection,
+                          "com.endlessm.Metrics",
+                          self->timer_object_path,
+                          "com.endlessm.Metrics.AggregateTimer",
+                          "StopTimer",
+                          NULL, NULL,
+                          G_DBUS_CALL_FLAGS_NO_AUTO_START,
+                          G_MAXINT,
+                          NULL, NULL, NULL);
+}
+
+static void
 emtr_aggregate_timer_finalize (GObject *object)
 {
   EmtrAggregateTimer *self = (EmtrAggregateTimer *)object;
 
-  if (!self->stopped && self->timer_proxy)
-    emer_aggregate_timer_call_stop_timer (self->timer_proxy, NULL, NULL, NULL);
+  if (!self->stopped)
+    call_stop_timer (self);
 
   g_cancellable_cancel (self->cancellable);
   g_clear_object (&self->cancellable);
-  g_clear_object (&self->timer_proxy);
+  g_clear_pointer (&self->timer_object_path, g_free);
 
   G_OBJECT_CLASS (emtr_aggregate_timer_parent_class)->finalize (object);
 }
@@ -72,24 +90,6 @@ emtr_aggregate_timer_init (EmtrAggregateTimer *self)
 }
 
 static void
-on_aggregate_timer_proxy_created_cb (GObject      *source_object,
-                                     GAsyncResult *result,
-                                     gpointer      user_data)
-{
-  g_autoptr(EmtrAggregateTimer) self = EMTR_AGGREGATE_TIMER (user_data);
-  g_autoptr(GError) error = NULL;
-
-  self->timer_proxy =
-    emer_aggregate_timer_proxy_new_for_bus_finish (result, &error);
-
-  if (error)
-    g_warning ("Error creating aggregate timer: %s", error->message);
-
-  if (self->stopped && self->timer_proxy)
-    emer_aggregate_timer_call_stop_timer (self->timer_proxy, NULL, NULL, NULL);
-}
-
-static void
 on_server_aggregate_timer_started_cb (GObject      *source_object,
                                       GAsyncResult *result,
                                       gpointer      user_data)
@@ -98,8 +98,6 @@ on_server_aggregate_timer_started_cb (GObject      *source_object,
   EmerEventRecorderServer *event_recorder_server;
   g_autofree gchar *timer_object_path = NULL;
   g_autoptr(GError) error = NULL;
-  GDBusConnection *connection;
-  GDBusProxy *proxy;
 
   event_recorder_server = EMER_EVENT_RECORDER_SERVER (source_object);
   emer_event_recorder_server_call_start_aggregate_timer_finish (event_recorder_server,
@@ -122,17 +120,7 @@ on_server_aggregate_timer_started_cb (GObject      *source_object,
    */
   g_clear_object (&self->cancellable);
 
-  proxy = G_DBUS_PROXY (source_object);
-  connection = g_dbus_proxy_get_connection (proxy);
-  emer_aggregate_timer_proxy_new (connection,
-                                  G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES |
-                                  G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS |
-                                  G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START,
-                                  g_dbus_proxy_get_name (proxy),
-                                  timer_object_path,
-                                  NULL,
-                                  on_aggregate_timer_proxy_created_cb,
-                                  g_object_ref (self));
+  self->timer_object_path = g_steal_pointer (&timer_object_path);
 }
 
 EmtrAggregateTimer *
@@ -145,6 +133,7 @@ emtr_aggregate_timer_new (EmerEventRecorderServer *dbus_proxy,
 
   self = g_object_new (EMTR_TYPE_AGGREGATE_TIMER, NULL);
   self->cancellable = g_cancellable_new ();
+  self->connection = g_dbus_proxy_get_connection (G_DBUS_PROXY (dbus_proxy));
 
   emer_event_recorder_server_call_start_aggregate_timer (dbus_proxy,
                                                          event_id,
@@ -171,8 +160,6 @@ emtr_aggregate_timer_stop (EmtrAggregateTimer *self)
   g_return_if_fail (!self->stopped);
 
   g_cancellable_cancel (self->cancellable);
-
-  if (self->timer_proxy)
-    emer_aggregate_timer_call_stop_timer (self->timer_proxy, NULL, NULL, NULL);
+  call_stop_timer (self);
   self->stopped = TRUE;
 }
