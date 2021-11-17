@@ -94,7 +94,7 @@ on_server_aggregate_timer_started_cb (GObject      *source_object,
                                       GAsyncResult *result,
                                       gpointer      user_data)
 {
-  g_autoptr(EmtrAggregateTimer) self = EMTR_AGGREGATE_TIMER (user_data);
+  EmtrAggregateTimer *self;
   EmerEventRecorderServer *event_recorder_server;
   g_autofree gchar *timer_object_path = NULL;
   g_autoptr(GError) error = NULL;
@@ -113,6 +113,8 @@ on_server_aggregate_timer_started_cb (GObject      *source_object,
         g_warning ("Error creating aggregate timer: %s", error->message);
       return;
     }
+
+  self = EMTR_AGGREGATE_TIMER (user_data);
 
   /* If the timer creation wasn't cancelled yet, we can't cancel the
    * proxy creation. From now on, if we need to stop the timer, we need
@@ -151,7 +153,7 @@ emtr_aggregate_timer_new (EmerEventRecorderServer *dbus_proxy,
                                                          auxiliary_payload,
                                                          self->cancellable,
                                                          on_server_aggregate_timer_started_cb,
-                                                         g_object_ref (self));
+                                                         self);
 
   return self;
 }
