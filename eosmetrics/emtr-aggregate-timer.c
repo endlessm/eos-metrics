@@ -36,6 +36,7 @@ struct _EmtrAggregateTimer
   GObject parent_instance;
 
   EmerAggregateTimer *timer_proxy; /* (owned) */
+  GCancellable *cancellable; /* (owned) */
 
   gboolean stopped;
 };
@@ -50,6 +51,8 @@ emtr_aggregate_timer_finalize (GObject *object)
   if (!self->stopped && self->timer_proxy)
     emer_aggregate_timer_call_stop_timer (self->timer_proxy, NULL, NULL, NULL);
 
+  g_cancellable_cancel (self->cancellable);
+  g_clear_object (&self->cancellable);
   g_clear_object (&self->timer_proxy);
 
   G_OBJECT_CLASS (emtr_aggregate_timer_parent_class)->finalize (object);
@@ -106,9 +109,16 @@ on_server_aggregate_timer_started_cb (GObject      *source_object,
 
   if (error)
     {
-      g_warning ("Error creating aggregate timer: %s", error->message);
+      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+        g_warning ("Error creating aggregate timer: %s", error->message);
       return;
     }
+
+  /* If the timer creation wasn't cancelled yet, we can't cancel the
+   * proxy creation. From now on, if we need to stop the timer, we need
+   * wait for the proxy to be created, then call the Stop() D-Bus method.
+   */
+  g_clear_object (&self->cancellable);
 
   proxy = G_DBUS_PROXY (source_object);
   connection = g_dbus_proxy_get_connection (proxy);
@@ -132,13 +142,14 @@ emtr_aggregate_timer_new (EmerEventRecorderServer *dbus_proxy,
   EmtrAggregateTimer *self;
 
   self = g_object_new (EMTR_TYPE_AGGREGATE_TIMER, NULL);
+  self->cancellable = g_cancellable_new ();
 
   emer_event_recorder_server_call_start_aggregate_timer (dbus_proxy,
                                                          event_id,
                                                          aggregate_key,
                                                          TRUE,
                                                          auxiliary_payload,
-                                                         NULL,
+                                                         self->cancellable,
                                                          on_server_aggregate_timer_started_cb,
                                                          g_object_ref (self));
 
@@ -156,6 +167,8 @@ emtr_aggregate_timer_stop (EmtrAggregateTimer *self)
 {
   g_return_if_fail (EMTR_IS_AGGREGATE_TIMER (self));
   g_return_if_fail (!self->stopped);
+
+  g_cancellable_cancel (self->cancellable);
 
   if (self->timer_proxy)
     emer_aggregate_timer_call_stop_timer (self->timer_proxy, NULL, NULL, NULL);
