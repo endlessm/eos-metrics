@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 EmtrAggregateTimer *emtr_aggregate_timer_new (EmerEventRecorderServer *dbus_proxy,
                                               GVariant                *event_id,
                                               GVariant                *aggregate_key,
+                                              gboolean                 has_payload,
                                               GVariant                *auxiliary_payload);
 
 G_END_DECLS
