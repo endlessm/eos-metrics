@@ -619,6 +619,19 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         timer.stop()
         self.await_method_call("StopTimer")
 
+    def test_start_timer_passes_null_payload(self):
+        key_string = "org.gnome.Builder.desktop"
+        key_variant = GLib.Variant.new_string(key_string)
+        timer, calls = self.call_start_timer(key_variant, None)
+        self.assertIsInstance(timer, EosMetrics.AggregateTimer)
+        self.assertEqual(calls[0][2][1], key_string)
+        self.assertEqual(calls[0][2][2], False)
+        self.assertEqual(calls[0][2][3], dbus.Boolean(False, variant_level=1))
+
+        # Now stop it
+        timer.stop()
+        self.await_method_call("StopTimer")
+
     def test_timer_calls_stop_when_disposed(self):
         key_variant = GLib.Variant.new_uint32(42)
         payload_variant = None

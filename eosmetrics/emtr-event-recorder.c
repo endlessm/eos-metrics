@@ -1319,13 +1319,16 @@ emtr_event_recorder_start_aggregate_timer (EmtrEventRecorder *self,
 
   get_uuid_builder (parsed_event_id, &event_id_builder);
 
-  maybe_payload =
-    auxiliary_payload ? auxiliary_payload : priv->empty_auxiliary_payload;
+  if (auxiliary_payload == NULL)
+    maybe_payload = priv->empty_auxiliary_payload;
+  else
+    maybe_payload = g_variant_new_variant (auxiliary_payload);
 
   return emtr_aggregate_timer_new (priv->dbus_proxy,
                                    g_variant_builder_end (&event_id_builder),
                                    g_variant_new_variant (aggregate_key),
-                                   g_variant_new_variant (maybe_payload));
+                                   auxiliary_payload != NULL,
+                                   maybe_payload);
 }
 
 #undef _IS_VARIANT
