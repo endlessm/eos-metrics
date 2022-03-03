@@ -66,18 +66,14 @@
  * const MEANINGLESS_AGGREGATED_EVENT = "01ddd9ad-255a-413d-8c8c-9495d810a90f";
  * const MEANINGLESS_EVENT_WITH_AUX_DATA =
  *   "9f26029e-8085-42a7-903e-10fcd1815e03";
- *
  * let eventRecorder = EosMetrics.EventRecorder.get_default();
- *
  * // Records a single instance of MEANINGLESS_EVENT along with the current
  * // time.
  * eventRecorder.record_event(MEANINGLESS_EVENT, null);
- *
  * // Records the fact that MEANINGLESS_AGGREGATED_EVENT occurred 23
  * // times since the last time it was recorded.
  * eventRecorder.record_events(MEANINGLESS_AGGREGATED_EVENT,
  *   23, null);
- *
  * // Records MEANINGLESS_EVENT_WITH_AUX_DATA along with some auxiliary data and
  * // the current time.
  * eventRecorder.record_event(MEANINGLESS_EVENT_WITH_AUX_DATA,
