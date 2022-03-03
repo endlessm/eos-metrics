@@ -70,10 +70,11 @@
  * // Records a single instance of MEANINGLESS_EVENT along with the current
  * // time.
  * eventRecorder.record_event(MEANINGLESS_EVENT, null);
- * // Records the fact that MEANINGLESS_AGGREGATED_EVENT occurred 23
- * // times since the last time it was recorded.
- * eventRecorder.record_events(MEANINGLESS_AGGREGATED_EVENT,
- *   23, null);
+ * // Records the fact that MEANINGLESS_AGGREGATED_EVENT occurred for some
+ * // duration
+ * let timer = eventRecorder.start_aggregate_timer(
+ *   MEANINGLESS_AGGREGATED_EVENT, null, null);
+ * timer.stop()
  * // Records MEANINGLESS_EVENT_WITH_AUX_DATA along with some auxiliary data and
  * // the current time.
  * eventRecorder.record_event(MEANINGLESS_EVENT_WITH_AUX_DATA,
