@@ -24,6 +24,7 @@ emtr_event_recorder_record_progress
 emtr_event_recorder_record_stop
 emtr_event_recorder_record_stop_sync
 emtr_event_recorder_start_aggregate_timer
+emtr_event_recorder_start_aggregate_timer_with_uid
 <SUBSECTION Standard>
 EMTR_EVENT_RECORDER
 EMTR_EVENT_RECORDER_CLASS

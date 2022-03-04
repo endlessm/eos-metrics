@@ -73,7 +73,7 @@
  * // Records the fact that MEANINGLESS_AGGREGATED_EVENT occurred for some
  * // duration
  * let timer = eventRecorder.start_aggregate_timer(
- *   MEANINGLESS_AGGREGATED_EVENT, null, null);
+ *   MEANINGLESS_AGGREGATED_EVENT, null);
  * timer.stop()
  * // Records MEANINGLESS_EVENT_WITH_AUX_DATA along with some auxiliary data and
  * // the current time.
@@ -1279,7 +1279,6 @@ emtr_event_recorder_record_stop_sync (EmtrEventRecorder *self,
  * emtr_event_recorder_start_aggregate_timer:
  * @self: an #EmtrEventRecorder
  * @event_id: an RFC 4122 UUID representing the type of event that took place
- * @aggregate_key: the identifier used to aggregate data
  * @auxiliary_payload: (nullable): miscellaneous data to associate with the
  * events. Must not contain maybe variants as they are not compatible with
  * D-Bus.
@@ -1291,8 +1290,29 @@ emtr_event_recorder_record_stop_sync (EmtrEventRecorder *self,
 EmtrAggregateTimer *
 emtr_event_recorder_start_aggregate_timer (EmtrEventRecorder *self,
                                            const gchar       *event_id,
-                                           GVariant          *aggregate_key,
                                            GVariant          *auxiliary_payload)
+{
+  return emtr_event_recorder_start_aggregate_timer_with_uid (self, getuid (), event_id, auxiliary_payload);
+}
+
+/**
+ * emtr_event_recorder_start_aggregate_timer_with_uid:
+ * @self: an #EmtrEventRecorder
+ * @uid: the UID to ascribe the event to
+ * @event_id: an RFC 4122 UUID representing the type of event that took place
+ * @auxiliary_payload: (nullable): miscellaneous data to associate with the
+ * events. Must not contain maybe variants as they are not compatible with
+ * D-Bus.
+ *
+ * Requests the metrics daemon to create an aggregate timer.
+ *
+ * Returns: (transfer full)(nullable): a #EmtrAggregateTimer
+ */
+EmtrAggregateTimer *
+emtr_event_recorder_start_aggregate_timer_with_uid (EmtrEventRecorder *self,
+                                                    uid_t              uid,
+                                                    const gchar       *event_id,
+                                                    GVariant          *auxiliary_payload)
 {
   EmtrEventRecorderPrivate *priv =
     emtr_event_recorder_get_instance_private (self);
@@ -1301,7 +1321,6 @@ emtr_event_recorder_start_aggregate_timer (EmtrEventRecorder *self,
   uuid_t parsed_event_id;
 
   g_return_val_if_fail (EMTR_IS_EVENT_RECORDER (self), NULL);
-  g_return_val_if_fail (_IS_VARIANT (aggregate_key), NULL);
   g_return_val_if_fail (auxiliary_payload == NULL ||
                         _IS_VARIANT (auxiliary_payload), NULL);
 
@@ -1322,8 +1341,8 @@ emtr_event_recorder_start_aggregate_timer (EmtrEventRecorder *self,
     maybe_payload = g_variant_new_variant (auxiliary_payload);
 
   return emtr_aggregate_timer_new (priv->dbus_proxy,
+                                   uid,
                                    g_variant_builder_end (&event_id_builder),
-                                   g_variant_new_variant (aggregate_key),
                                    auxiliary_payload != NULL,
                                    maybe_payload);
 }

@@ -427,7 +427,6 @@ test_event_recorder_aggregate_start_stop_sync (struct RecorderFixture *fixture,
 
   timer = emtr_event_recorder_start_aggregate_timer (fixture->recorder,
                                                      MEANINGLESS_EVENT,
-                                                     g_variant_new_uint32 (1001),
                                                      NULL);
   emtr_aggregate_timer_stop (timer);
 }
@@ -440,7 +439,6 @@ test_event_recorder_aggregate_start_stop_sync_with_payload (struct RecorderFixtu
 
   timer = emtr_event_recorder_start_aggregate_timer (fixture->recorder,
                                                      MEANINGLESS_EVENT,
-                                                     g_variant_new_string ("org.gnome.Builder.desktop"),
                                                      g_variant_new_string ("org.gnome.Builder.desktop"));
   // Destroying the timer should call stop here
 }
