@@ -89,7 +89,7 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
                                       '', '')
         self.interface_mock.AddMethod('', 'RecordEventSequence', 'uaya(xbv)',
                                       '', '')
-        self.interface_mock.AddMethod('', 'StartAggregateTimer', 'ayvbv', 'o',
+        self.interface_mock.AddMethod('', 'StartAggregateTimer', 'uaybv', 'o',
                                       f"ret = '{self._TIMER_OBJECT_PATH}'")
 
         self.interface_mock.AddObject(
@@ -196,10 +196,17 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
                                              None, payload_stop)
         return self.interface_mock.GetCalls()
 
-    def call_start_timer(self, aggregate_key, payload=None):
+    def call_start_timer(self, payload=None):
         timer = self.event_recorder.start_aggregate_timer(self._MOCK_EVENT_NOTHING_HAPPENED,
-                                                          aggregate_key,
                                                           payload)
+        return timer, self.await_method_call("StartAggregateTimer")
+
+    def call_start_timer_with_uid(self, uid, payload=None):
+        timer = self.event_recorder.start_aggregate_timer_with_uid(
+            uid,
+            self._MOCK_EVENT_NOTHING_HAPPENED,
+            payload,
+        )
         return timer, self.await_method_call("StartAggregateTimer")
 
     # Recorder calls D-Bus at all.
@@ -605,13 +612,13 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.assertEqual(calls[0][2][2][2][2], stop_string)
 
     def test_start_timer_passes_payload(self):
-        key_string = "org.gnome.Builder.desktop"
-        key_variant = GLib.Variant.new_string(key_string)
         payload_string = "com.example.Payload"
         payload_variant = GLib.Variant.new_string(payload_string)
-        timer, calls = self.call_start_timer(key_variant, payload_variant)
+        timer, calls = self.call_start_timer(payload_variant)
         self.assertIsInstance(timer, EosMetrics.AggregateTimer)
-        self.assertEqual(calls[0][2][1], key_string)
+        self.assertEqual(calls[0][2][0], os.getuid())
+        actual_uuid = self.dbus_bytes_to_uuid(calls[0][2][1])
+        self.assertEqual(self._MOCK_EVENT_NOTHING_HAPPENED_UUID, actual_uuid)
         self.assertEqual(calls[0][2][2], True)
         self.assertEqual(calls[0][2][3], payload_string)
 
@@ -620,11 +627,8 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.await_method_call("StopTimer")
 
     def test_start_timer_passes_null_payload(self):
-        key_string = "org.gnome.Builder.desktop"
-        key_variant = GLib.Variant.new_string(key_string)
-        timer, calls = self.call_start_timer(key_variant, None)
+        timer, calls = self.call_start_timer(None)
         self.assertIsInstance(timer, EosMetrics.AggregateTimer)
-        self.assertEqual(calls[0][2][1], key_string)
         self.assertEqual(calls[0][2][2], False)
         self.assertEqual(calls[0][2][3], dbus.Boolean(False, variant_level=1))
 
@@ -633,12 +637,24 @@ class TestDaemonIntegration(dbusmock.DBusTestCase):
         self.await_method_call("StopTimer")
 
     def test_timer_calls_stop_when_disposed(self):
-        key_variant = GLib.Variant.new_uint32(42)
         payload_variant = None
-        timer, calls = self.call_start_timer(key_variant, payload_variant)
+        timer, calls = self.call_start_timer(payload_variant)
         self.assertIsInstance(timer, EosMetrics.AggregateTimer)
 
         del timer
+        self.await_method_call("StopTimer")
+
+    def test_start_timer_with_uid_passes_uid(self):
+        payload_string = "org.gnome.Builder.desktop"
+        payload_variant = GLib.Variant.new_string(payload_string)
+        timer, calls = self.call_start_timer_with_uid(0x656f73, payload_variant)
+        self.assertIsInstance(timer, EosMetrics.AggregateTimer)
+        self.assertEqual(calls[0][2][0], 0x656f73)
+        self.assertEqual(calls[0][2][2], True)
+        self.assertEqual(calls[0][2][3], dbus.String(payload_string, variant_level=1))
+
+        # Now stop it
+        timer.stop()
         self.await_method_call("StopTimer")
 
 

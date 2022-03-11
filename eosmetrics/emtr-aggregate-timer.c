@@ -125,15 +125,12 @@ on_server_aggregate_timer_started_cb (GObject      *source_object,
 
 EmtrAggregateTimer *
 emtr_aggregate_timer_new (EmerEventRecorderServer *dbus_proxy,
+                          uid_t                    uid,
                           GVariant                *event_id,
-                          GVariant                *aggregate_key,
                           gboolean                 has_payload,
                           GVariant                *auxiliary_payload)
 {
   EmtrAggregateTimer *self;
-
-  g_return_val_if_fail (aggregate_key != NULL, NULL);
-  g_return_val_if_fail (g_variant_is_of_type (aggregate_key, G_VARIANT_TYPE_VARIANT), NULL);
 
   g_return_val_if_fail (auxiliary_payload != NULL, NULL);
   g_return_val_if_fail (g_variant_is_of_type (auxiliary_payload, G_VARIANT_TYPE_VARIANT), NULL);
@@ -141,8 +138,8 @@ emtr_aggregate_timer_new (EmerEventRecorderServer *dbus_proxy,
   self = g_object_new (EMTR_TYPE_AGGREGATE_TIMER, NULL);
 
   emer_event_recorder_server_call_start_aggregate_timer (dbus_proxy,
+                                                         uid,
                                                          event_id,
-                                                         aggregate_key,
                                                          has_payload,
                                                          auxiliary_payload,
                                                          NULL,

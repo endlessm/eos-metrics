@@ -154,6 +154,7 @@ License along with eos-metrics.  If not, see
 
     <!--
       StartAggregateTimer:
+      @user_id: user ID
       @event_id: event type UUID, as an array of 16 bytes
       @aggregate_key: a key to aggregate events
       @has_payload: whether the start event has a payload
@@ -164,16 +165,12 @@ License along with eos-metrics.  If not, see
 
       @payload is ignored if @has_payload is FALSE. (This is to compensate for
       DBus's lack of maybe types.)
-
-      @aggregate_key is the domain-specific key to aggregate. It can be, for
-      example, the application id when tracking applications, or the unix user
-      id when tracking session times.
     -->
     <method name="StartAggregateTimer">
+      <arg type="u" name="user_id"/>
       <arg type="ay" name="event_id">
         <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
       </arg>
-      <arg type="v" name="aggregate_key"/>
       <arg type="b" name="has_payload"/>
       <arg type="v" name="payload"/>
       <arg type="o" name="timer_object_path" direction="out"/>
