@@ -1,0 +1,18 @@
+eos-metrics (0.3.0) unstable; urgency=low
+
+  * Add synchronous versions of event recorder methods that call D-Bus.
+  * Deprecate emtr_event_id_to_name method and event IDs.
+
+ -- Kurt von Laven <kurt@endlessm.com>  Wed, 08 Apr 2015 12:29:00 -0500
+
+eos-metrics (0.2.0) unstable; urgency=low
+
+  * Package now installs utility header and event recorder server XML files.
+
+ -- Kurt von Laven <kurt@endlessm.com>  Fri, 03 Oct 2014 17:55:00 -0500
+
+eos-metrics (0.0.0) unstable; urgency=low
+
+  * Initial release
+
+ -- Philip Chimento <philip@endlessm.com>  Sat, 11 Jan 2014 20:03:11 -0500
