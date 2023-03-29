@@ -1,0 +1,3 @@
+option('docs', type: 'boolean', value: false, description: 'Build documentation pages')
+option('introspection', type: 'boolean', value: true, description: 'Generate introspection data')
+option('tests', type: 'boolean', value: true, description: 'Build tests')
