@@ -19,11 +19,14 @@
 import dbus
 import dbusmock
 import dbus.mainloop.glib
+import gi
 import os
 import subprocess
 import time
 import unittest
 import uuid
+
+gi.require_version('EosMetrics', '0')
 
 from gi.repository import EosMetrics
 from gi.repository import GLib
