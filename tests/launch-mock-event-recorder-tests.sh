@@ -48,4 +48,4 @@ gdbus call --system \
     ("RecordAggregateEvent", "uayxxbv", "", ""),
     ("RecordEventSequence", "uaya(xbv)", "", "")]'
 
-gtester "$@"
+gtester --i-know-this-is-deprecated --g-fatal-warnings "$@"
