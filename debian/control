@@ -1,6 +1,6 @@
 Source: eos-metrics
 Priority: standard
-Maintainer: Kurt von Laven <kurt@endlessm.com>
+Maintainer: Endless OS Team <maintainers@endlessos.org>
 Build-Depends: debhelper (>= 8.0.0),
                gobject-introspection,
                gtk-doc-tools (>= 1.18),
