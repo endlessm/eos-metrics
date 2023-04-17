@@ -31,7 +31,8 @@
  *
  * Since: 0.6
  */
-#define EMTR_MAJOR_VERSION (@EMTR_MAJOR_VERSION@)
+#mesondefine EMTR_MAJOR_VERSION
+
 /**
  * EMTR_MINOR_VERSION:
  *
@@ -42,7 +43,8 @@
  *
  * Since: 0.6
  */
-#define EMTR_MINOR_VERSION (@EMTR_MINOR_VERSION@)
+#mesondefine EMTR_MINOR_VERSION
+
 /**
  * EMTR_MICRO_VERSION:
  *
@@ -51,4 +53,4 @@
  *
  * Since: 0.6
  */
-#define EMTR_MICRO_VERSION (@EMTR_MICRO_VERSION@)
+#mesondefine EMTR_MICRO_VERSION

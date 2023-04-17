@@ -1,12 +1,12 @@
 Source: eos-metrics
 Priority: standard
-Maintainer: Kurt von Laven <kurt@endlessm.com>
-Build-Depends: autotools-dev,
-               debhelper (>= 8.0.0),
+Maintainer: Endless OS Team <maintainers@endlessos.org>
+Build-Depends: debhelper (>= 8.0.0),
                gobject-introspection,
                gtk-doc-tools (>= 1.18),
                libgirepository1.0-dev,
                libglib2.0-dev (>= 2.38),
+               meson (>= 0.62),
                pkg-config,
                python3-dbus,
                python3-dbusmock,

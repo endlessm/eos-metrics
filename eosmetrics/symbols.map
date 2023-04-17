@@ -1,0 +1,7 @@
+{
+global:
+    EMTR_*;
+    emtr_*;
+local:
+    *;
+};

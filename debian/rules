@@ -10,11 +10,11 @@
 #export DH_VERBOSE=1
 
 %:
-	dh $@  --with autotools-dev,gir
+	dh $@  --with meson-dev,gir
 
 # Build our documentation as well
 override_dh_auto_configure:
-	dh_auto_configure -- --enable-strict-flags --enable-gtk-doc --enable-gir-doc
+	dh_auto_configure -- -Dintrospection=true -Ddocs=true
 
 override_dh_auto_test:
 	dh_auto_test || ( find . -name '*.log' | xargs cat; false )
